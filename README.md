@@ -1,1 +1,1 @@
-# emtelligent.com
+# nlp in emtell
