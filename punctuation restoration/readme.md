@@ -24,7 +24,7 @@ We suggest to employ a hybrid method combing a rule-based classifer with ML clas
 
 ## Rules
 
-Rules to assign tags:
+##### Rules to assign tags:
 	
 tags: '#' for bullet point, '_' for heading.
 
@@ -41,7 +41,7 @@ tags: '#' for bullet point, '_' for heading.
 	and first char '-' or '#' ==> '#'
 
 
-Rules to restore punctuations:
+##### Rules to restore punctuations:
 
 	- tag '_': keep.
 	- tag '#': remove.
@@ -49,7 +49,7 @@ Rules to restore punctuations:
 	- tag ',' or '\n': check and restore.
 
 
-Rules to restoration for types of problem (decision tree in order):
+##### Rules to restoration for types of problem (decision tree in order):
 
 	- 'good': if n_bullet == n_period or (n_bullet == n_bline and n_period == 0):
 		Do nothing.
@@ -80,7 +80,7 @@ Rules to restoration for types of problem (decision tree in order):
 
 The hybrid classifier includes:
 
-1) restore_punctuation.py
+##### 1. restore_punctuation.py
 
 Restore punctuations in the discharge diagnosis of a list of medical reports.
 
@@ -91,7 +91,7 @@ Restore punctuations in the discharge diagnosis of a list of medical reports.
 		-m : ML classifier model.
 		     Default is to create a new model.
 
-2) dd_helper.py
+##### 2. dd_helper.py
 
 methods:
 
@@ -103,7 +103,7 @@ methods:
 
 	usage:  from dd_helper import *
 
-3) dd_model_helper.py
+##### 3. dd_model_helper.py
 
 methods:
 
@@ -114,14 +114,14 @@ methods:
 
 	usage:  from dd_model_helper import *
 
-4) MLP.py
+##### 4. MLP.py
 
 Dynet MLP nueral network consists of train(), predict(), save() and load().
 
 	usage:  from MLP import MLP
 		mlp_model = MLP(spec)
 
-5) RNN.py
+##### 5. RNN.py
 
 Dynet RNN nueral network consists of train(), predict(), save() and load().
 
@@ -236,17 +236,17 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
  
 ##### 3. ML classifier: comma_clf.model
 
- Data samples are collected from 'good' sentences and other sentences with tag '.'.
+  Data samples are collected from 'good' sentences and other sentences with tag '.'.
 
- For label comma ',', we collect 2920 identical sentences (from 7886). They give us 3189 samples.
+  For label comma ',', we collect 2920 identical sentences (from 7886). They give us 3189 samples.
 
- For label period '.', we collect 17380 identical sentences (from 86861). After augmentation with shuffled tail sentences, we got 22118 samples.
+  For label period '.', we collect 17380 identical sentences (from 86861). After augmentation with shuffled tail sentences, we got 22118 samples.
 
- Shuffle and split them into 23254 training and 2053 testing samples.
+  Shuffle and split them into 23254 training and 2053 testing samples.
 
- Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
+  Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
 
- While best char-based (head = 25 and tail = 15 chars) LSTM model gives the best accuracy 0.9459, word-based MLP model gives a better accuracy 0.9489:
+  While best char-based (head = 25 and tail = 15 chars) LSTM model gives the best accuracy 0.9459, word-based MLP model gives a better accuracy 0.9489:
 
 		vocabs: 8712  tags: 2  len(feature_vec): 9
 		[8712, 300, 2700, 2, 1, 'Adam', 'model/comma_clf.model']
