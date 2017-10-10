@@ -318,7 +318,7 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		Accuracy: 98.29%
 
 ##### 5. Model accuracy
-                     comma_clf  linebreak_clf
+                     <u> comma_clf  linebreak_clf </u>
 
       word-based MLP   0.9489    0.9829
 
