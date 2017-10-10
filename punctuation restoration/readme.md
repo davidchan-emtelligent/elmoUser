@@ -132,11 +132,11 @@ Dynet RNN nueral network consists of train(), predict(), save() and load().
 
 ## Test case
 
-1. Data:
+##### 1. Data:
 
 We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 reports has non-empty discharge diagnoses(dd).
 
-2. Restore punctuations for different types of problem:
+##### 2. Restore punctuations for different types of problem:
 
 	'good': 35848
 
@@ -234,19 +234,19 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		4. diabetes type 2, hypertension, hyperlipidemia.
 
  
-3) ML classifier: comma_clf.model
+##### 3. ML classifier: comma_clf.model
 
-- Data samples are collected from 'good' sentences and other sentences with tag '.'.
+ Data samples are collected from 'good' sentences and other sentences with tag '.'.
 
-- For label comma ',', we collect 2920 identical sentences (from 7886). They give us 3189 samples.
+ For label comma ',', we collect 2920 identical sentences (from 7886). They give us 3189 samples.
 
-- For label period '.', we collect 17380 identical sentences (from 86861). After augmentation with shuffled tail sentences, we got 22118 samples.
+ For label period '.', we collect 17380 identical sentences (from 86861). After augmentation with shuffled tail sentences, we got 22118 samples.
 
-- Shuffle and split them into 23254 training and 2053 testing samples.
+ Shuffle and split them into 23254 training and 2053 testing samples.
 
-- Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
+ Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
 
-- While best char-based (head = 25 and tail = 15 chars) LSTM model gives the best accuracy 0.9459, word-based MLP model gives a better accuracy 0.9489:
+ While best char-based (head = 25 and tail = 15 chars) LSTM model gives the best accuracy 0.9459, word-based MLP model gives a better accuracy 0.9489:
 
 		vocabs: 8712  tags: 2  len(feature_vec): 9
 		[8712, 300, 2700, 2, 1, 'Adam', 'model/comma_clf.model']
@@ -280,7 +280,8 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		Accuracy: 94.89%
 
 
-4) ML classifier: linebreak_clf.model
+##### 4. ML classifier: linebreak_clf.model
+
 - We collect data samples from 'good' sentences and other sentences with tag '.'.
 
 - Samples are collected word-wise through 2 concatenated sentences (head and tail sentences). After augmentation with shuffled tail sentences, we got 66735 training sample and 7546 testing sample.
@@ -318,10 +319,11 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		 [  96 1704]]
 
 		Accuracy: 98.29%
+		
 
-comma_clf linebreak_clf
+                     comma_clf  linebreak_clf
 
-word-based MLP 0.9489 0.9829
+      word-based MLP   0.9489    0.9829
 
-char-based LSTM 0.9459 0.9685
+      char-based LSTM  0.9459    0.9685
 
