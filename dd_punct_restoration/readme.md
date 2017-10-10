@@ -1,16 +1,16 @@
-# Problem
+## Problem
 
 The punctuation ambiguities in a discharge diagnosis summary (medical note) mainly are colon, line-break, comma and period. Our goal is to examine all these punctuations and restore the incorrect punctuations in summary. Finally, we can provide a list of correct bullet points.
 
 <br> 
 
-#Method
+## Method
 
 We suggest to employ a hybrid method combing a rule-based classifer with ML classifers to classify the type of problem and restore the incorrect punctuations. The method is:
 
-  1) Split the raw text into fragments and record the existing punctuations at their two ends.
+1) Split the raw text into fragments and record the existing punctuations at their two ends.
 
-  2) Using a rule-based classifier to remove the existing bullet points and assign a tag (punctuation) to each fragment. These can keep the fragments which are well formatted.
+2) Using a rule-based classifier to remove the existing bullet points and assign a tag (punctuation) to each fragment. These can keep the fragments which are well formatted.
 
 3) Collect the statistic of punctuations for the whole summary: # of bullets, # of periods, # of line-breaks, # of lines and # of heading (fragment with a colon is a possible heading).
 
@@ -20,7 +20,9 @@ We suggest to employ a hybrid method combing a rule-based classifer with ML clas
 
 6) Re-construct the list of bullet points with desire format.
 
-Rules
+<br> 
+
+## Rules
 
 Rules to assign tags:
 	tags: '#' for bullet point, '_' for heading.
@@ -70,7 +72,7 @@ Rules to restoration for types of problem (decision tree in order):
 	Use restore_comma_2sentences() to restore ',' as well.
 
 
-Hybrid Classifier
+## Hybrid Classifier
 
 The hybrid classifier includes:
 
