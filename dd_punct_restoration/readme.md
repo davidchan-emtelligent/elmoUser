@@ -93,7 +93,7 @@ Restore punctuations in the discharge diagnosis of a list of medical reports.
 
 2) dd_helper.py
 
-has methods:
+methods:
 
 	parse2segments(): parse a raw summary to segments with punctuations at 2 ends.
 	segments2notes(): remove existing bullet points, assign tags for each segment and get the punctuation statistic.
@@ -105,7 +105,7 @@ has methods:
 
 3) dd_model_helper.py
 
-has methods:
+methods:
 
 	padding_feature_word_wise(): pad 2 segments (head and tail) to a sample feature in words.
 	word_based_2_char_based(): convert word_based feature to char_based feature.
@@ -132,68 +132,90 @@ Dynet RNN nueral network consists of train(), predict(), save() and load().
 
 ## Test case
 
-1) Data:
+1. Data:
 
 We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 reports has non-empty discharge diagnoses(dd).
 
-2) Restore punctuations for different types of problem:
+2. Restore punctuations for different types of problem:
 
-	- 'good': 35848
+	'good': 35848
 
-	- 'bullet_1': 12048
+	'bullet_1': 12048
 	
 		================
 		report_id:97981
 		================(70, bullet_eq_period)
+		
 		------------ ###### input -------------
+		
 		1.  Status post minimally invasive mitral valve repair via a
 
 		right thoracotomy.
 
 		2.  Hypothyroidism.
+		
 		------------output------------
+		
 		1. Status post minimally invasive mitral valve repair via a right thoracotomy.
 		2. Hypothyroidism.
 
-	- 'period_1_bullet_0': 6119
+	'period_1_bullet_0': 6119
+	
 		================
 		report_id:97959
 		================(49, period_1_bullet_0)
+		
 		------------input-------------
+		
 		Gastric perforation from marginal
 
 		ulcer.
+		
 		------------output------------
+		
 		1. Gastric perforation from marginal ulcer.
 
-	- 'comma_1': 2205
+	'comma_1': 2205
+	
 		================
 		report_id:97965
 		================(55, comma_1)
+		
 		------------input-------------
+		
 		etoh intoxication, etoh withdrawal seizure
+		
 		------------output------------
+		
 		1. etoh intoxication.
 		2. etoh withdrawal seizure.
 
-	- 'period_0_bullet_0_short': 29207
+	'period_0_bullet_0_short': 29207
+	
 		================
 		report_id:97910
 		================(0, period_0_bullet_0_short)
+		
 		------------input-------------
+		
 		Listeria meningitis
 
 		Ulcerative colitis
+		
 		------------output------------
+		
 		1. Listeria meningitis.
 		2. Ulcerative colitis.
 
 
-	- 'period_0_bullet_0_long': 14420
+	'period_0_bullet_0_long': 14420
+	
 		================
 		report_id:98002
 		================(90, period_0_bullet_0_long)
+		
 		------------input-------------
+		
 		Primary: oropharyngeal swelling, delirium, urinary tract
 
 		infection
@@ -201,7 +223,9 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		Secondary: Parkinson's disease, diabetes type 2, hypertension,
 
 		hyperlipidemia
+		
 		------------output------------
+		
 		# Primary
 		1. oropharyngeal swelling, delirium, urinary tract.
 		2. infection.
@@ -224,76 +248,80 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 
 - While best char-based (head = 25 and tail = 15 chars) LSTM model gives the best accuracy 0.9459, word-based MLP model gives a better accuracy 0.9489:
 
-	vocabs: 8712  tags: 2  len(feature_vec): 9
-	[8712, 300, 2700, 2, 1, 'Adam', 'model/comma_clf.model']
-	epoch:2 train_loss:0.5626 train_acc: 0.9831 val_acc:0.9464    
-	update model: model/comma_clf.model
-	epoch:3 train_loss:0.3029 train_acc: 0.9917 val_acc:0.9469   
-	update model: model/comma_clf.model
-	epoch:5 train_loss:0.0266 train_acc: 0.9972 val_acc:0.9479    
-	update model: model/comma_clf.model
-	epoch:10 train_loss:0.0025 train_acc: 0.9986 val_acc:0.9474     
-	epoch:12 train_loss:0.0020 train_acc: 0.9986 val_acc:0.9484    
-	update model: model/comma_clf.model
-	epoch:15 train_loss:0.0008 train_acc: 0.9990 val_acc:0.9484    
-	epoch:16 train_loss:0.0008 train_acc: 0.9986 val_acc:0.9489   
-	update model: model/comma_clf.model
-	epoch:20 train_loss:0.0005 train_acc: 0.9990 val_acc:0.9464     
-	time: 32.4604980946
+		vocabs: 8712  tags: 2  len(feature_vec): 9
+		[8712, 300, 2700, 2, 1, 'Adam', 'model/comma_clf.model']
+		epoch:2 train_loss:0.5626 train_acc: 0.9831 val_acc:0.9464    
+		update model: model/comma_clf.model
+		epoch:3 train_loss:0.3029 train_acc: 0.9917 val_acc:0.9469   
+		update model: model/comma_clf.model
+		epoch:5 train_loss:0.0266 train_acc: 0.9972 val_acc:0.9479    
+		update model: model/comma_clf.model
+		epoch:10 train_loss:0.0025 train_acc: 0.9986 val_acc:0.9474     
+		epoch:12 train_loss:0.0020 train_acc: 0.9986 val_acc:0.9484    
+		update model: model/comma_clf.model
+		epoch:15 train_loss:0.0008 train_acc: 0.9990 val_acc:0.9484    
+		epoch:16 train_loss:0.0008 train_acc: 0.9986 val_acc:0.9489   
+		update model: model/comma_clf.model
+		epoch:20 train_loss:0.0005 train_acc: 0.9990 val_acc:0.9464     
+		time: 32.4604980946
 
-		     precision    recall  f1-score   support
+			     precision    recall  f1-score   support
 
-	      comma       0.87      0.79      0.83       316
-	     period       0.96      0.98      0.97      1737
+		      comma       0.87      0.79      0.83       316
+		     period       0.96      0.98      0.97      1737
 
-	avg / total       0.95      0.95      0.95      2053
+		avg / total       0.95      0.95      0.95      2053
 
-	confusion matrix:
-	 comma period
-	[[ 249   38]
-	 [  67 1699]]
+		confusion matrix:
+		 comma period
+		[[ 249   38]
+		 [  67 1699]]
 
-	Accuracy: 94.89%
+		Accuracy: 94.89%
 
 
 4) ML classifier: linebreak_clf.model
 - We collect data samples from 'good' sentences and other sentences with tag '.'.
+
 - Samples are collected word-wise through 2 concatenated sentences (head and tail sentences). After augmentation with shuffled tail sentences, we got 66735 training sample and 7546 testing sample.
+
 - Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
+
 - Word-based MLP model gives a better accuracy 0.9829:
 
-	vocabs: 8021  tags: 2  len(feature_vec): 9
-	[8021, 300, 2700, 2, 1, 'Adam', 'model/linebreak_clf.model']
-	epoch:1 train_loss:5.5361 train_acc: 0.9880 val_acc:0.9780   
-	update model: model/linebreak_clf.model
-	epoch:2 train_loss:3.5135 train_acc: 0.9962 val_acc:0.9823   
-	update model: model/linebreak_clf.model
-	epoch:3 train_loss:0.3759 train_acc: 0.9984 val_acc:0.9826   
-	update model: model/linebreak_clf.model
-	epoch:4 train_loss:0.0149 train_acc: 0.9987 val_acc:0.9829   
-	update model: model/linebreak_clf.model
-	epoch:5 train_loss:0.0048 train_acc: 0.9988 val_acc:0.9825  
-	epoch:10 train_loss:0.0045 train_acc: 0.9996 val_acc:0.9817     
-	epoch:15 train_loss:0.0001 train_acc: 0.9996 val_acc:0.9793      
-	epoch:20 train_loss:0.0000 train_acc: 0.9996 val_acc:0.9786      
-	time: 77.5569369793
+		vocabs: 8021  tags: 2  len(feature_vec): 9
+		[8021, 300, 2700, 2, 1, 'Adam', 'model/linebreak_clf.model']
+		epoch:1 train_loss:5.5361 train_acc: 0.9880 val_acc:0.9780   
+		update model: model/linebreak_clf.model
+		epoch:2 train_loss:3.5135 train_acc: 0.9962 val_acc:0.9823   
+		update model: model/linebreak_clf.model
+		epoch:3 train_loss:0.3759 train_acc: 0.9984 val_acc:0.9826   
+		update model: model/linebreak_clf.model
+		epoch:4 train_loss:0.0149 train_acc: 0.9987 val_acc:0.9829   
+		update model: model/linebreak_clf.model
+		epoch:5 train_loss:0.0048 train_acc: 0.9988 val_acc:0.9825  
+		epoch:10 train_loss:0.0045 train_acc: 0.9996 val_acc:0.9817     
+		epoch:15 train_loss:0.0001 train_acc: 0.9996 val_acc:0.9793      
+		epoch:20 train_loss:0.0000 train_acc: 0.9996 val_acc:0.9786      
+		time: 77.5569369793
 
-		     precision    recall  f1-score   support
+			     precision    recall  f1-score   support
 
-	      space       0.99      0.98      0.99      5793
-	     period       0.95      0.98      0.96      1737
+		      space       0.99      0.98      0.99      5793
+		     period       0.95      0.98      0.96      1737
 
-	avg / total       0.98      0.98      0.98      7530
+		avg / total       0.98      0.98      0.98      7530
 
-	confusion matrix:
-	 space period
-	[[5697   33]
-	 [  96 1704]]
+		confusion matrix:
+		 space period
+		[[5697   33]
+		 [  96 1704]]
 
-	Accuracy: 98.29%
+		Accuracy: 98.29%
 
 comma_clf linebreak_clf
 
 word-based MLP 0.9489 0.9829
+
 char-based LSTM 0.9459 0.9685
 
