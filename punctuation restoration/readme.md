@@ -146,7 +146,7 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		report_id:97981
 		================(70, bullet_eq_period)
 		
-		------------ ###### input -------------
+		------------**input**-------------
 		
 		1.  Status post minimally invasive mitral valve repair via a
 
@@ -154,7 +154,7 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 
 		2.  Hypothyroidism.
 		
-		------------output------------
+		------------**output**------------
 		
 		1. Status post minimally invasive mitral valve repair via a right thoracotomy.
 		2. Hypothyroidism.
@@ -165,13 +165,13 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		report_id:97959
 		================(49, period_1_bullet_0)
 		
-		------------input-------------
+		------------**input**-------------
 		
 		Gastric perforation from marginal
 
 		ulcer.
 		
-		------------output------------
+		------------**output**------------
 		
 		1. Gastric perforation from marginal ulcer.
 
@@ -181,11 +181,11 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		report_id:97965
 		================(55, comma_1)
 		
-		------------input-------------
+		------------**input**-------------
 		
 		etoh intoxication, etoh withdrawal seizure
 		
-		------------output------------
+		------------**output**------------
 		
 		1. etoh intoxication.
 		2. etoh withdrawal seizure.
@@ -196,13 +196,13 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		report_id:97910
 		================(0, period_0_bullet_0_short)
 		
-		------------input-------------
+		------------**input**-------------
 		
 		Listeria meningitis
 
 		Ulcerative colitis
 		
-		------------output------------
+		------------**output**------------
 		
 		1. Listeria meningitis.
 		2. Ulcerative colitis.
@@ -214,7 +214,7 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		report_id:98002
 		================(90, period_0_bullet_0_long)
 		
-		------------input-------------
+		------------**input**-------------
 		
 		Primary: oropharyngeal swelling, delirium, urinary tract
 
@@ -224,7 +224,7 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 
 		hyperlipidemia
 		
-		------------output------------
+		------------**output**------------
 		
 		# Primary
 		1. oropharyngeal swelling, delirium, urinary tract.
@@ -318,8 +318,6 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 		 [  96 1704]]
 
 		Accuracy: 98.29%
-		
-<br> 
 
 ##### 5. Model accuracy
                      comma_clf  linebreak_clf
