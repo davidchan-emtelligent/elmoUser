@@ -224,7 +224,7 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 
 		hyperlipidemia
 		
-		------------**output**------------
+		------------ **output** ------------
 		
 		# Primary
 		1. oropharyngeal swelling, delirium, urinary tract.
