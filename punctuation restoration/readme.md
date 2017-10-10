@@ -211,27 +211,25 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 	'period_0_bullet_0_long': 14420
 	
 		================
-		report_id:98002
-		================(90, period_0_bullet_0_long)
+		report_id:98176
+		================(247, period_0_bullet_0_long)
 		
-		------------**input**-------------
+		------------input-------------
 		
-		Primary: oropharyngeal swelling, delirium, urinary tract
+		Primary: Cellulitis
 
-		infection
+		Secondary: Atrial fibrillation, Chronic systolic heart failure,
 
-		Secondary: Parkinson's disease, diabetes type 2, hypertension,
-
-		hyperlipidemia
+		End stage renal disease on [**Name (NI) 2252**]
 		
-		------------~~output~~------------
+		------------output------------
 		
 		# Primary
-		1. oropharyngeal swelling, delirium, urinary tract.
-		2. infection.
+		1. Cellulitis.
 		# Secondary
-		3. Parkinson's disease.
-		4. diabetes type 2, hypertension, hyperlipidemia.
+		2. Atrial fibrillation.
+		3. Chronic systolic heart failure.
+		4. End stage renal disease on [**Name (NI) 2252**].
 
  
 ##### 3. ML classifier: comma_clf.model
