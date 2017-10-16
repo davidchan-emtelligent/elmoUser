@@ -74,21 +74,29 @@ tags: '#' for bullet point, '_' for heading.
 		One valid bullet point. Do nothing.
 
 	- 'comma_1': one line match one heading and n_comma > 0:
-		Use restore_comma_2sentences() or simply replace ',' to '.'.
+		Use restore_comma_by_clf() or simply replace ',' to '.'.
 
 	- 'period_0_bullet_0_short': n_period == 0 and n_bullet == 0, and len(fragment) < bad_length(45-50):
-		Use restore_linebread_2sentences() to restore '\n' or simply replace '\n' to '.'.
-		Use restore_comma_2sentences() to restore ',' as well.
+		Use restore_linebreak_by_clf() to restore '\n' or simply replace '\n' to '.'.
+		Use restore_comma_by_clf() to restore ',' as well.
 
 	- 'period_0_bullet_0_long': n_period == 0 and n_bullet == 0, and len(fragment) >= bad_length(45-50):
-		Use restore_linebread_2sentences() to restore '\n'.
-		Use restore_comma_2sentences() to restore ',' as well.
+		Use restore_linebreak_by_clf() to restore '\n'.
+		Use restore_comma_by_clf() to restore ',' as well.
 
 <br> 
 
 ## Hybrid Classifier
 
 The hybrid classifier includes:
+
+ - rule-based methods are in dd_helper.py.
+ 
+ - ML classifiers are in dd_model_help.py.
+ 
+<br> 
+ 
+## Scripts 
 
 ##### 1. restore_punctuation.py
 
@@ -120,7 +128,8 @@ methods:
 	type_classifier(): classify the type of problem for a summary.
 	restore_bullet_2sentences(): restore punctuations for a summary with bullet points.
 	restore_period_2sentences(): restore punctuations for a summary with periods.
-
+	comma2period(): replace comma to period when summary has one line without period.
+	
 	usage:  from dd_helper import *
 
 ##### 4. dd_model_helper.py
@@ -131,8 +140,8 @@ methods:
 
 	padding_feature_word_wise(): pad 2 segments (head and tail) to a sample feature in words.
 	word_based_2_char_based(): convert word_based feature to char_based feature.
-	restore_linebreak_2sentences(): restore linebreaks with ML classifer.
-	restore_comma_2sentences(): restore commas with ML classifer.
+	restore_linebreak_by_clf(): restore linebreaks with ML classifer.
+	restore_comma_by_clf(): restore commas with ML classifer.
 
 	usage:  from dd_model_helper import *
 
