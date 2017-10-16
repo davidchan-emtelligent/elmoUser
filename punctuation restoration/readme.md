@@ -92,7 +92,7 @@ The hybrid classifier includes:
 
  - rule-based methods are in dd_helper.py.
  
- - ML classifiers are in dd_model_help.py.
+ - ML classifiers are in dd_model_helper.py.
  
 <br> 
  
