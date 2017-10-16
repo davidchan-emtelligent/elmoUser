@@ -49,20 +49,15 @@ def train_save_model(X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, windo
 	y_pred = clf.predict(X_test, batch_size)
 	print get_scores(Y_test, y_pred, target_names = target_names)
 
-	return 1
-
 
 def create_models(dd_lst, model_dir):
-
+	
 	#1) get sentences data from dd_lst
 	period_lst, comma_lst, heading_lower_lst = get_sentences_data(dd_lst)
 
 	#2) get features and labels for comma clf
 	X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, target_names = \
-        	get_comma_features_labels(comma_lst, period_lst, 5, 3, char_based=False, nn='mlp')  #True)  #
-
-	train_save_model(X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, \
-		target_names, model_dir + 'comma_clf.model')
+        	get_comma_features_labels(comma_lst, period_lst, 6, 3, char_based=False, nn='mlp')  #True)  #
 
 	#3) save parameters
 	with open(model_dir + 'comma_clf_parameters.json', 'w') as fj:
@@ -70,22 +65,26 @@ def create_models(dd_lst, model_dir):
 	with open(model_dir + 'comma_clf_vocab2idx.json', 'w') as fj:
 	    json.dump(vocab2idx, fj)
 
-	#4) get features and labels for linebreak clf
-	X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, target_names = \
-		get_linebreak_features_labels(period_lst, 5, 3, char_based=False, nn='mlp')
-
+	#4) train and save model
 	train_save_model(X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, \
-		target_names, model_dir + 'linebreak_clf.model')
+		target_names, model_dir + 'comma_clf.model')
 
-	#5) save parameters
+	#5) get features and labels for linebreak clf
+	X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, target_names = \
+		get_linebreak_features_labels(period_lst, 6, 3, char_based=False, nn='mlp')
+
+	#6) save parameters
 	with open(model_dir + 'linebreak_clf_parameters.json', 'w') as fj:
 	    json.dump(parameters, fj)
 	with open(model_dir + 'linebreak_clf_vocab2idx.json', 'w') as fj:
 	    json.dump(vocab2idx, fj)
 
-	#6) save heading_lst
+	#7) train and save model
+	train_save_model(X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, \
+		target_names, model_dir + 'linebreak_clf.model')
+
+	#8) save heading_lst
 	heading_str = '\n'.join(heading_lower_lst)
-	#print len(heading_lower_lst), heading_str[:160]
 	with open('model/heading_lower_lst.txt', 'w') as fd:
 	    fd.write(heading_str)
 
