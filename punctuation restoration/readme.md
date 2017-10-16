@@ -1,24 +1,34 @@
 ## Problem
 
-The punctuation ambiguities in a discharge diagnosis summary (medical note) mainly are colon, line-break, comma and period. Our goal is to examine all these punctuations and restore the incorrect punctuations in summary. Finally, we can provide a list of correct bullet points.
+The punctuation ambiguities in a discharge diagnosis summary (medical note) mainly are colon, line-break, comma and period. Our goal is to examine all these punctuations and restore the incorrect punctuations. Finally, we can provide a list of correct sentences.
 
 <br> 
 
 ## Method
 
-We suggest to employ a hybrid method combing a rule-based classifer with ML classifers to classify the type of problem and restore the incorrect punctuations. The method is:
+We suggest to employ a hybrid method combing a rule-based classifer with ML classifers to classify the type of problem and restore the incorrect punctuations. The idea is:
+
+1) Use rules to verify a clause with a colon: if it is a heading or part of a sentence.
+
+2) Use rules to define a summary: is well formatted or not.
+
+3) For those well formatted, such as with bullet points and/or with comma and period at the same time, we simple concatenate the broken sentence(the long sentences are broken in raw data).
+
+4) For those not formatted, we use a ML comma/period classifier to examine the comma and use a ML space/period classifier to examine the line-break.
+
+The method is:
 
 1) Split the raw text into fragments and record the existing punctuations at their two ends.
 
 2) Using a rule-based classifier to remove the existing bullet points and assign a tag (punctuation) to each fragment. These can keep the fragments which are well formatted.
 
-3) Collect the statistic of punctuations for the whole summary: # of bullets, # of periods, # of line-breaks, # of lines and # of heading (fragment with a colon is a possible heading).
+3) Compute the statistic of punctuations for the whole summary: # of bullets, # of periods, # of line-breaks, # of lines and # of heading (fragment with a colon is a possible heading).
 
 4) Based on the statistic, we can decide if the summary is well formated or not. And we also can find out the ambiguities and therefor the type of problem. Furthermore we can find out which fragment has been formated well or not.
 
 5) According to the type of problem in each summary, we can choose either rule-based or ML method to restore the punctuations for the not well formated fragments.
 
-6) Re-construct the list of bullet points with desire format.
+6) Re-construct the list of sentences with desire format.
 
 <br> 
 
@@ -82,16 +92,26 @@ The hybrid classifier includes:
 
 ##### 1. restore_punctuation.py
 
-Restore punctuations in the discharge diagnosis of a list of medical reports.
+Check and restore punctuations in the discharge diagnoses of a list of medical reports.
 
 	usage: restore_punctuation.py -i csv_path -o output_path -m model_path
-		-i : a csv file has a list of medical reports.
-		-o : a json file has a list of dicts.
-		     Each dict has keys: 'report_id', 'sentences', 'tags', 'sentences_spans'.
-		-m : ML classifier model.
-		     Default is to create a new model.
+		-i : input report data csv file path.
+		-d : input discharge diagnoses data json file path.
+		-o : output json file to store a list of well formatted dicharge diagnoses.
+		-m : directory has ML classifier models.
 
-##### 2. dd_helper.py
+##### 2. create_models.py
+
+create a comma classifier and a line-break classifier models.
+
+	usage: create_models.py -i csv_path -m model_path
+		-i : input report data csv file path.
+		-d : input discharge diagnoses data json file path.
+		-m : output directory to save ML classifier models.
+
+##### 3. dd_helper.py
+
+Support 1. and 2.
 
 methods:
 
@@ -103,7 +123,9 @@ methods:
 
 	usage:  from dd_helper import *
 
-##### 3. dd_model_helper.py
+##### 4. dd_model_helper.py
+
+Support 1. and 2.
 
 methods:
 
@@ -114,14 +136,14 @@ methods:
 
 	usage:  from dd_model_helper import *
 
-##### 4. MLP.py
+##### 5. MLP.py
 
 Dynet MLP nueral network consists of train(), predict(), save() and load().
 
 	usage:  from MLP import MLP
 		mlp_model = MLP(spec)
 
-##### 5. RNN.py
+##### 6. RNN.py
 
 Dynet RNN nueral network consists of train(), predict(), save() and load().
 
@@ -134,7 +156,7 @@ Dynet RNN nueral network consists of train(), predict(), save() and load().
 
 ##### 1. Data:
 
-We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 reports has non-empty discharge diagnoses(dd).
+We use the data set 'all_m3_CT_and_DS_reports.csv'. It has 203180 reports in which 99847 reports has non-empty discharge diagnoses(dd).
 
 ##### 2. Restore punctuations for different types of problem:
 
@@ -234,6 +256,8 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
  
 ##### 3. ML classifier: comma_clf.model
 
+ - Binary classifier: comma/period.
+ 
  - Data samples are collected from 'good' sentences and other sentences with tag '.'.
 
  - For label comma ',', we collect 2920 identical sentences (from 7886). They give us 3189 samples.
@@ -242,9 +266,11 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 
  - Shuffle and split them into 23254 training and 2053 testing samples.
 
- - Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
+ - word-based features: use a window size of 9 words (head = 6 and tail = 3 words over 2 fragments) features for each sample.
 
- - While best char-based (head = 25 and tail = 15 chars) LSTM model gives the best accuracy 0.9459, word-based MLP model gives a better accuracy 0.9489:
+ - char-based features: use a window size of 40 chars (head = 25 and tail = 15 chars over 2 fragments) features for each sample.
+ 
+ - word-based MLP model gives a better accuracy 0.9489 while char-based LSTM model giving an accuracy 0.9303:
 
 		vocabs: 8712  tags: 2  len(feature_vec): 9
 		[8712, 300, 2700, 2, 1, 'Adam', 'model/comma_clf.model']
@@ -279,13 +305,17 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 
 ##### 4. ML classifier: linebreak_clf.model
 
+- Binary classifier: space/period.
+
 - We collect data samples from 'good' sentences and other sentences with tag '.'.
 
 - Samples are collected word-wise through 2 concatenated sentences (head and tail sentences). After augmentation with shuffled tail sentences, we got 66735 training sample and 7546 testing sample.
 
-- Using head = 6 and tail = 3 words, we create 9 words features for our nueral network model.
+ - word-based features: use a window size of 9 words (head = 6 and tail = 3 words over 2 fragments) features for each sample.
 
-- Word-based MLP model gives a better accuracy 0.9829:
+ - char-based features: use a window size of 40 chars (head = 25 and tail = 15 chars over 2 fragments) features for each sample.
+ 
+ - word-based MLP model gives a better accuracy 0.9829 while char-based LSTM model giving an accuracy 0.9627:
 
 		vocabs: 8021  tags: 2  len(feature_vec): 9
 		[8021, 300, 2700, 2, 1, 'Adam', 'model/linebreak_clf.model']
@@ -322,6 +352,6 @@ We use the data set 'all_rad_output.csv'. It has 203180 reports in which 99847 r
 	|                 | comma_clf  |  linebreak_clf  |  
 	-------------------------------------------------- 
 	| word-based MLP  |  0.9489    |     0.9829      |  
-	| char-based LSTM |  0.9459    |     0.9685      |  
+	| char-based LSTM |  0.9303    |     0.9627      |  
 	--------------------------------------------------
 
