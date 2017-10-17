@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*- 
+"""
+dd_helper.py
+	Methods to support restore_punctuations. Including the rule-based methods.
+
+usage: from dd_helper import *
+"""
 import numpy as np
 import sys
 import string
@@ -259,7 +265,7 @@ def isnot_linebreak(note_prev, note):
 
 delimiter = '\04'
 prev_tags = [' ', '\n']
-separators = [', ', ',\n', '. ', '.\n', ') ', ': ', ':\n', '\n']
+separators = [',', ', ', ',\n', '. ', '.\n', ') ', ': ', ':\n', '\n']
 
 separator2len = dict([(s, len(s)) for s in separators])
 
@@ -267,7 +273,10 @@ separator2len = dict([(s, len(s)) for s in separators])
 #parse a dd into segments
 def parse2segments(text):
 
-	text = text + '\n'
+	if text[-1] == ',':
+		text = text[:-1] + '.\n'
+	else:
+		text = text + '\n'
 
 	min_ptr = 0
 	max_ptr = len(text)
@@ -297,6 +306,8 @@ def parse2segments(text):
 		else:
 			if text[ptr_end] == '\n':
 				end_tag = '\n'
+			elif text[ptr_end] == ',':
+				end_tag = ','
 			else:
 				end_tag = text[ptr_end:ptr_end+2]
 
@@ -372,7 +383,7 @@ def segments2notes(dd, idx, bad_len=50):
 
 		tag =''
 		seg_idxs = [i]
-		if prev_tag == ' ' and end_tag == '\n':
+		if prev_tag in [',', ' '] and end_tag == '\n':
 			tag = '\n'
 
 		elif prev_tag == '\n' and end_tag == '\n':
@@ -383,10 +394,10 @@ def segments2notes(dd, idx, bad_len=50):
 			else:
 				tag = '\n'
 
-		elif prev_tag == ' ' and end_tag == ':\n':
+		elif prev_tag in [',', ' '] and end_tag == ':\n':
 			tag = '_'
 
-		elif prev_tag == ' ' and end_tag == ': ':
+		elif prev_tag in [',', ' '] and end_tag == ': ':
 			#concate the note_prev
 			tag = end_tag
 			n_concate += 1
@@ -404,18 +415,18 @@ def segments2notes(dd, idx, bad_len=50):
 		elif prev_tag == '\n' and end_tag == ':\n':
 			tag = '_'			
 			
-		elif prev_tag in [' ', '\n'] and end_tag in [', ', ',\n']:
+		elif prev_tag in [',', ' ', '\n'] and end_tag in [',', ', ', ',\n']:
 			tag = ','
 			
-		elif prev_tag in [' ', '\n'] and end_tag == '.\n':
+		elif prev_tag in [',', ' ', '\n'] and end_tag == '.\n':
 			tag = '.' 
 
-		elif prev_tag == ' ' and end_tag in ['. ', ') ']:
-			tag = end_tag 
-			n_concate += 1
+		#elif prev_tag == ' ' and end_tag in ['. ', ') ']:
+		#	tag = end_tag 
+		#	n_concate += 1
 
 		#bullet point with 1,2,3,...		
-		elif prev_tag == '\n' and end_tag in ['. ', ') ']:		   
+		elif prev_tag in [',', ' ', '\n'] and end_tag in ['. ', ') ']:		   
 			seg = text[s:e]
 			words = seg.split()
 			num = words[0].translate(None, string.punctuation)
@@ -440,8 +451,12 @@ def segments2notes(dd, idx, bad_len=50):
 
 			#check error line break, eg. ...heart\nfailure.
 			if len(notes) > 0:
-				#concatenate to prev segment: last tag is ': ', ') ' or ',' 
-				if tags[-1] not in ['_', '.', '\n','#']:
+				#bullet is not concatenated to prev segment
+				if tags[-1] == ',' and tag == '#':
+					tags[-1] = '.'
+
+				#concatenate to prev segment: last tag is ': ', ') ' or ','
+				elif tags[-1] in ['. ', ': ', ') ', ',']:  #not in ['_', '.', '\n','#']:
 					last_tag = tags[-1]
 					if last_tag == ',':
 						last_tag = ', '
@@ -847,7 +862,7 @@ if __name__=="__main__":
 
 	#1) get data-----------------
 	import json
-	with open ('dd_reports.json') as fj:
+	with open ('dd_lst.json') as fj:
 		dd_lst = json.load(fj)
 		
 	from dd_helper import *
