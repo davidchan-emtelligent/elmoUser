@@ -1,24 +1,24 @@
 """
 mlp.py
 	A Dynet MLP lookup plus one layer model. 
-	Using it to train and predict classes(tags/chars/words) for sequences of elements(chars/words).
+	Train a model and predict classes(tags:punctuations) for sequences of elements(features:chars/words).
 
 Usage:
 
 import MLP
 
 #build a new MLP, HIDDEN_SIZE = EMBEDDINGS_SIZE*feature_size(window_size)
-#specs = [VOCAB_SIZE, EMBEDDINGS_SIZE, HIDDEN_SIZE, NUM_OF_CLASSES, optimizer]
-specs = [100, 25, 30, 2, 'lstm', 'Adagrad']
+#specs = [VOCAB_SIZE, EMBEDDINGS_SIZE, STATE_SIZE, NUM_OF_CLASSES, NUM_OF_LAYERS, optimizer, model_path]
+specs = [100, 25, 30, 2, 'SGD', 'model/a.model']
 mlp = MLP(specs)
-mlp.train(batches_x, batches_y)
+mlp.train(X, Y, X_dev, Y_dev, batch_size, max_iteration, display_every)
 y_pred_lst = mlp.predict(x_lst)
 mlp.save(path)
 
 #load from path
 mlp1 = MLP()
 mlp1.load(path)
-mlp1.train(batches_x, batches_y)
+mlp1.train(X, Y, X_dev, Y_dev, batch_size, max_iteration, display_every)
 y_pred_lst = mlp1.predict(x_lst)
 mlp1.save(other_path)
 """
@@ -192,8 +192,8 @@ class MLP:
 #testing
 if __name__=="__main__":
 
-	mlp = MLP([5,10,20,3, "SGD"])
+	mlp = MLP([5,10,20,3,1, "SGD", "a.txt"])
 
-	mlp.train([[[1,2],[3,2]],[[1,0],[2,0]]], [[1,2], [0,2]], 20)
+	mlp.train([[1,2],[3,2],[1,0],[2,0]],[0,1,1,2], [[1,2], [0,2]],[0,2], 2, 20, 1)
 	print
-	print mlp._predict([[1,0]])
+	print "predict [1,0]:", mlp._predict([[1,0]])
