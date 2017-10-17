@@ -1,8 +1,8 @@
 """
 dd_model_help.py
-	provides methods to support to create and train models, and to predict.
+	Methods to create, train and load models, and also to predict the punctuations.
 
-usage: from dd_model_helper import load_model
+usage: from dd_model_helper import *
 """
 import sys
 import json
@@ -603,7 +603,7 @@ if __name__=="__main__":
 
 	#1) get data-----------------
 	import json
-	with open ('dd_reports.json') as fj:
+	with open ('dd_lst.json') as fj:
 		dd_lst = json.load(fj)
 		
 	from dd_helper import *
@@ -616,8 +616,8 @@ if __name__=="__main__":
 	for i, d in enumerate(dd_lst[:1000]): #[1165:1166]):   #[57:58]):   #[19574:19576]:
 		idx = d['report_id']		
 		page = d['discharge_diagnosis'].encode('utf-8')
-		base = d['span_base'] 
-		original_idx = d['original_idx']
+		base = d['original_file_span_base'] 
+		original_idx = d['original_file_idx']
 
 		dd = parse2segments(page)		
 		notes = segments2notes(dd, i, bad_len=48)		
@@ -628,9 +628,8 @@ if __name__=="__main__":
 		dd.update({'dd_type': dd_type})
 
 		dd.update({'report_id': idx})
-		dd.update({'original_idx': original_idx})
-		dd.update({'span_base': base})
-		dd.update({'original_idx': original_idx})
+		dd.update({'original_file_idx': original_idx})
+		dd.update({'original_file_span_base': base})
 		dd.update({'original_file': d['original_file']})
 
 		dd.update({'info': notes['info'], 'notes_bad': notes['notes_bad'],'notes': notes['notes'],\
@@ -674,5 +673,4 @@ if __name__=="__main__":
 		print '------------input-------------\n', dd_lst[dd['dd_idx']]['discharge_diagnosis']
 		print '------------output------------\n', sentence2string(sentences, tags)
 		print spans 
-
 
