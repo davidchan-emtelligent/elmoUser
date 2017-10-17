@@ -1,24 +1,24 @@
 """
 RNN.py
 	A Dynet rnn network model. 
-	Using it to train and predict classes(tags:punctuations) for sequences of elements(features:chars/words).
+	Train a model and predict classes(tags:punctuations) for sequences of elements(features:chars/words).
 
 Usage:
 
 import RNN
 
 #build a new RNN
-#specs = [VOCAB_SIZE, EMBEDDINGS_SIZE, STATE_SIZE, NUM_OF_CLASSES, NUM_OF_LAYERS, rnn_cell, optimizer]
-specs = [100, 25, 30, 2, 1, 'lstm', 'Adagrad']
+#specs = [VOCAB_SIZE, EMBEDDINGS_SIZE, STATE_SIZE, NUM_OF_CLASSES, NUM_OF_LAYERS, rnn_cell, optimizer, model_path]
+specs = [100, 25, 30, 2, 1, 'lstm', 'Adagrad', model/punctuation.model]
 rnn = RNN(specs)
-rnn.train(batches_x, batches_y)
+rnn.train(X, Y, X_dev, Y_dev, batch_size, max_iteration, display_every)
 y_pred_lst = rnn.predict(x_lst)
 rnn.save(path)
 
 #load from path
 rnn1 = RNN()
 rnn1.load(path)
-rnn1.train(batches_x, batches_y)
+rnn1.train(X, Y, X_dev, Y_dev, batch_size, max_iteration, display_every)
 y_pred_lst = rnn1.predict(x_lst)
 mlp1.save(other_path)
 """
@@ -333,19 +333,17 @@ if __name__=="__main__":
 	STATE_SIZE = 64
 	NUM_OF_CLASSES = len(tag_lst)
 
-	specs = [VOCAB_SIZE, EMBEDDINGS_SIZE, STATE_SIZE, NUM_OF_CLASSES, NUM_OF_LAYERS, 'lstm', 'Adagrad']
+	specs = [VOCAB_SIZE, EMBEDDINGS_SIZE, STATE_SIZE, NUM_OF_CLASSES, NUM_OF_LAYERS, 'lstm', \
+			'Adagrad', 'a.model']
 	rnn = RNN(specs)
 
 	batch_size = 5
-	batches_x, batches_y = rnn.get_batch(X, Y, batch_size)
-
 	max_iter = 20
 	display_every = 1
-	rnn.train(batches_x, batches_y, max_iter, display_every)
+	rnn.train(X, Y, X, Y, batch_size, max_iter, display_every)
 
-	y_pred = rnn.predict(batches_x[0])
-	print y_pred
-	print batches_y[0]
+	y_pred = rnn.predict([X[-2]])
+	print "predict ",X[-2], " : ",y_pred
 
 
 			
