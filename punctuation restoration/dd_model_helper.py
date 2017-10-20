@@ -55,6 +55,7 @@ def load_model(model_path):
 
 #----------------------get features for training and testing---------
 #padding a feature
+#sentence_head, sentence_tail => one sample: x_features[i]
 def get_feature(h_seg, t_seg, padding, head, tail):
 	
 	h_feats = Tok(h_seg)[-head:]
@@ -72,6 +73,7 @@ def get_feature(h_seg, t_seg, padding, head, tail):
 
 
 #get features at the segments at separator
+#[sentence_1, sentence_2,....., sentence_n] => [feature_1, feature_2, .... feature_n-1], [label1, ..label_n-1]
 def paddingAtSeparator(sent_lst, separator, tag, padding, head, tail):
 				
 	segment_lst = map(lambda sent: sent.split(separator), sent_lst)
@@ -103,6 +105,7 @@ def paddingAtSeparator(sent_lst, separator, tag, padding, head, tail):
 
 
 #padding features for each word ending
+#sentences_list1, sentences_list2 => x_features, y_labels
 def padding_feature_word_wise(head_sentences, tail_sentences, tag, padding, head, tail):
 			   
 	x_features = []
@@ -357,7 +360,7 @@ def get_comma_features_labels(comma_lst, period_lst, head=5, tail=3, char_based=
 
 	parameters = {'char_based': char_based, 'head': head, 'tail': tail, 'head_char': head_new, \
 		'tail_char': tail_new, 'padding': padding, 'embedding_size': EMBEDDINGS_SIZE, \
-		'tag_lst': tag_lst, 'nn': nn} 
+		'tag_lst': tag_lst, 'nn': nn, 'target_names': target_names}
 	
 	return  X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, target_names
 
@@ -410,34 +413,33 @@ def get_linebreak_features_labels(period_lst, head=5, tail=3, char_based=False, 
 
 	parameters = {'char_based': char_based, 'head': head, 'tail': tail, 'head_char': head_new, \
 		'tail_char': tail_new, 'padding': padding, 'embedding_size': EMBEDDINGS_SIZE, \
-		'tag_lst': tag_lst, 'nn': nn} 
+		'tag_lst': tag_lst, 'nn': nn, 'target_names': target_names} 
 
 	return  X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, window_size, target_names
 
 
 #----------------------prediction classifier: space/period---------for linebreak tag
-#classify a list of features to given labels
-def linebreak_classifier(pairs, separator, clf):	
+#classify a list of word features (convert to char if char_based first) to labels
+def word_features_classifier(word_testing, clf):
 	[model, vocab2idx, parameters] = clf
 
 	head = parameters['head']
 	tail = parameters['tail']
 	padding = parameters['padding']
-	
-	word_testing, y_testing, vocab_testing = \
-		paddingAtSeparator(pairs, separator, 'anything', padding, head, tail)
-		
+	tag_lst = parameters['tag_lst']
+	target_names = parameters['target_names']
+
 	X_test = []		
 	if parameters['char_based']:
 		head_char = parameters['head_char']
 		tail_char = parameters['tail_char']
 		x_testing = word_based_2_char_based(word_testing, padding, head, tail, head_char, tail_char)
-		
+
 		X_test = map(lambda lst: [vocab2idx[v] for v in lst], x_testing)
-		
+
 	else:
 		x_testing = word_testing
-		
+
 		for lst in x_testing:
 			try:
 				X_test += [[vocab2idx[v] for v in lst]]
@@ -447,135 +449,87 @@ def linebreak_classifier(pairs, separator, clf):
 						#print [lst[i]],'---------------------'
 						lst[i] = 'unk0'
 				X_test += [[vocab2idx[v] for v in lst]]		
-			
+
+	y_pred = model.predict(X_test, 1000)
 		
-	y_pred = model.predict(X_test)
-	#for (x, y) in zip(x_testing, y_pred):
-	#	print x, [y]
-	
-	tag_lst = parameters['tag_lst'] 
-	
 	return map(lambda p: tag_lst[p], y_pred)
-	
 
-#restore linebreak				  
-def restore_linebreak_by_clf(notes, notes_tags, notes_bad, notes_seg_idxs, clf):
 
-	new_notes = []
-	tags = []
-	idxs = []
-	pairs = []
-	for i, (note, t, b, idx_lst) in enumerate(zip(notes[:-1], notes_tags[:-1], notes_bad[:-1],\
-		 notes_seg_idxs[:-1])):
+#restore linebreak
+def restore_linebreak_by_clf(linebreak_dd_lst, linebreak_clf):
+	
+	[model, vocab2idx, parameters] = linebreak_clf
 
-		if t == '_' or t == '.':
-			new_notes += [note]
-			tags += [t]
-			idxs += [idx_lst]
-			"""
-		elif b == 0:
-			new_notes += [note]
-			tags += ['.']
-			idxs += [idx_lst]
-			#"""			
-		elif t == '\n': 
-			new_notes += [note]
-			tags += [t]
-			idxs += [idx_lst]
-			pairs += [note + '\n' + notes[i+1]]
-			
-	new_notes += [notes[-1]]
-	tags += ['.']
-	idxs += [notes_seg_idxs[-1]] 
-	
-	y_pred = linebreak_classifier(pairs, '\n', clf)
-	
+	head = parameters['head']
+	tail = parameters['tail']
+	padding = parameters['padding']
+	separator = '\n'
+
+	word_testing = []
+	for dd in linebreak_dd_lst:
+
+		sent_str = ''
+		for (sent, tag) in zip(dd['notes'][:-1], dd['notes_tags'][:-1]):
+			#print sent, [tag]
+			if tag == separator:
+				sent_str += sent + separator
+			sent_str += dd['notes'][-1]
+		#print sent_str; print dd['raw']; print dd['notes_tags'];sys.exit(0)
+		x, _, _ = paddingAtSeparator([sent_str], separator, 'anything', padding, head, tail)
+		word_testing += x
+
+	#print len(word_testing)
+	#print word_testing[:3]
+
+	y_pred = word_features_classifier(word_testing, linebreak_clf)
+
 	j = 0
-	for i in xrange(len(new_notes)):
-		if tags[i] == '\n':
-			tags[i] = y_pred[j]
-			j += 1
+	for dd in linebreak_dd_lst:
 
-	#overright the predict to ' ' if the last char is ','
-	if new_notes[i][-1] == ',':
-		tags[i] = ' '
+		for i, tag in enumerate(dd['notes_tags'][:-1]):
+			if tag == separator:
+				dd['notes_tags'][i] = y_pred[j]
+				j += 1
+		dd['notes_tags'][-1] = '.'
 
-	return new_notes, tags, idxs
+	if j != len(word_testing):
+		print "ERROR prediction idx!"
+		sys.exit(0)
+
+	#print "linebreak classification completed!"
+	
+	return linebreak_dd_lst
 
 
 #----------------------prediction classifier: comma/period---------for comma tag
 #classify a list of sentence with comma
-def comma_classifier(sentence, clf):
-	[model, vocab2idx, parameters] = clf
-	
+def restore_comma_by_clf(comma_dd_lst, head_tail_pairs, comma_clf):
+	[model, vocab2idx, parameters] = comma_clf
+
 	head = parameters['head']
 	tail = parameters['tail']
-	padding = parameters['padding'] 
-	
-	word_testing, y_labels, _ = \
-		paddingAtSeparator([sentence], ', ',  ',', padding, head, tail)
-	
-	X_test = []
-	if parameters['char_based']:
-		head_char = parameters['head_char']
-		tail_char = parameters['tail_char']
-		x_testing = word_based_2_char_based(word_testing, padding, head, tail, head_char, tail_char)
-		
-		X_test = map(lambda lst: [vocab2idx[v] for v in lst], x_testing)  
-		
-	else:
-		x_testing = word_testing  
-		
-		for lst in x_testing:
-			try:
-				X_test += [[vocab2idx[v] for v in lst]]
-				
-			except:
-				for i in xrange(len(lst)):
-					if lst[i] not in vocab2idx:
-						#print [lst[i]],'---------------------'
-						lst[i] = 'unk0'
-				X_test += [[vocab2idx[v] for v in lst]]		
-		
-		
-	y_pred = model.predict(X_test)
-	
-	tag_lst = parameters['tag_lst']
-	
-	return map(lambda y: tag_lst[y], y_pred)
+	padding = parameters['padding']
+	separator = ','
 
-#restore comma 
-def restore_comma_by_clf(notes, notes_tags, notes_seg_idxs, clf):
-	new_notes = []
-	tags = []
-	idxs = []
-	for (note, t, idx_lst) in zip(notes, notes_tags, notes_seg_idxs):
+	word_testing, _, _ = paddingAtSeparator(head_tail_pairs, separator, 'anything', padding, head, tail)
+	
+	y_pred = word_features_classifier(word_testing, comma_clf)
 
-		if t == '_':
-			new_notes += [note]
-			tags += [t]
-			idxs += [idx_lst]
-			
-		elif len(note.split(', ')) > 1:
-			y_pred = comma_classifier(note, clf)
-			lst = note.split(', ')
-			for (x, y, idx) in zip(lst[:-1], y_pred, idx_lst):
-				new_notes += [x]
-				tags += [y]
-				idxs += [[idx]]
- 
-			new_notes += [lst[-1]]
-			tags += ['.']
-			idxs += [[idx_lst[-1]]]
-			
-		elif t in ['\n', '.', ' ']: 
-			new_notes += [note]
-			tags += [t]
-			idxs += [idx_lst]
-			
-	tags[-1] = '.'
+	j = 0
+	for dd in comma_dd_lst:
 
-	return new_notes, tags, idxs
+		for i, tag in enumerate(dd['notes_tags'][:-1]):
+			if tag == separator:
+				dd['notes_tags'][i] = y_pred[j]
+				j += 1
+		dd['notes_tags'][-1] = '.'
+		
+
+	if j != len(word_testing):
+		print "ERROR prediction idx!"
+		sys.exit(0) 
+	
+	return comma_dd_lst
 
 
 from sklearn.metrics import classification_report
@@ -673,4 +627,5 @@ if __name__=="__main__":
 		print '------------input-------------\n', dd_lst[dd['dd_idx']]['discharge_diagnosis']
 		print '------------output------------\n', sentence2string(sentences, tags)
 		print spans 
+
 

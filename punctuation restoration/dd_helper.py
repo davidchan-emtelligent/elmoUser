@@ -20,6 +20,13 @@ else:
 	with open('model/heading_lower_lst.txt', 'r') as fd:
 		heading_lower_lst = fd.read().split('\n')
 
+if not os.path.isfile('model/sentence_len3_lst.txt'):
+	sentence_len3_lst = []
+else:
+	with open('model/sentence_len3_lst.txt', 'r') as fd:
+		sentence_len3_lst = fd.read().split('\n')
+
+
 #---------------------- extract discharge diagnosis data from csv -------------
 title_lst = ['Discharge Diagnosis:', 'Discharge Diagonsis:', 'Discharge Diagnoses:', \
 		'DISCHARGE DIAGNOSIS:', 'DISCHARGE DIAGNOSES:']
@@ -102,7 +109,7 @@ def extract_dd_raw(input_csv_path):
 
 	return dd_lst, reports_lst
 
-#---------------------- get data ----------------------------------------------
+#---------------------- get data for training, testing ----------------------------------------------
 #get sentences data with comma and with period at end
 def get_data(notes, tags, bad, n_comma, valid_lst=['.']):	
 	period_lst = []
@@ -141,7 +148,7 @@ def get_data(notes, tags, bad, n_comma, valid_lst=['.']):
 	return period_lst, comma_lst, linebreak_lst, n_data, n_sample, n_non_sample
 
 
-#get sentences data to support create models: period_sentences, comma_sentences and heading_lower
+#get sentences data to support models: period_sentences, comma_sentences, heading_lower and sentence_len3
 def get_sentences_data(dd_lst):
 	heading_lst = []
 
@@ -224,7 +231,6 @@ def extractList_start_end(text, head, tail, inclusive = False):
 					out = l_split[0]
 				ret += [out]
 			else:
-
 				#print "extractList_start_end(): can't find tail: '%s' in %s\n%s"%(tail,l_split, url)
 				continue
 	return ret   #a list
@@ -248,6 +254,14 @@ def is_heading(seg):
 	heading = seg.lower().translate(None, string.punctuation+string.digits).strip()
 	if heading in heading_lower_lst:
 		return True		
+	return False
+
+
+#check if it is a sentence has length <= 3
+def is_sentence_len3(seq, next_seq):
+	if len(seq.split()) < 4 and len(next_seq.split()) < 4:
+		if seq.lower() in sentence_len3_lst and next_seq.lower() in sentence_len3_lst:
+			return True
 	return False
 
 
@@ -378,6 +392,8 @@ def segments2notes(dd, idx, bad_len=50):
 	n_not_bullet_concate = 0
 	n_lb_concate = 0
 
+	len_1 = len(dd['segment_spans']) - 1
+
 	#1) create notes and tags by rules
 	for i, ((s, e), (prev_tag, end_tag)) in enumerate(zip(dd['segment_spans'], dd['segment_tags'])):
 
@@ -416,6 +432,18 @@ def segments2notes(dd, idx, bad_len=50):
 			tag = '_'			
 			
 		elif prev_tag in [',', ' ', '\n'] and end_tag in [',', ', ', ',\n']:
+			"""
+			if i < len_1:
+				seg = text[s:e]
+				(next_s, next_e) = dd['segment_spans'][i+1]
+				next_seq = text[next_s:next_e]
+				if is_sentence_len3(seg, next_seq):
+					tag = '.'
+				else:
+					tag = ','
+			else:
+				tag = ','
+			"""
 			tag = ','
 			
 		elif prev_tag in [',', ' ', '\n'] and end_tag == '.\n':
@@ -574,9 +602,9 @@ def type_classifier(dd):
 	info = dd['info']
 
 	[ n_lines, n_notes, n_period, n_bline, n_comma] = [info['n_lines'], info['n_notes'], \
-			info['n_period'], info['n_bline'], info['n_comma'] ]
+		info['n_period'], info['n_bline'], info['n_comma'] ]
 	[ n_heading, n_bullet, n_hyphen_bullet, max_word_len, max_byte_len ] = [info['n_heading'], \
-			info['n_bullet'], info['n_hyphen_bullet'], info['max_word_len'], info['max_byte_len'] ]
+		info['n_bullet'], info['n_hyphen_bullet'], info['max_word_len'], info['max_byte_len'] ]
 
 	#use the correct # of bullet	
 	if n_bullet == 0 and n_hyphen_bullet != 0:
@@ -703,7 +731,7 @@ def dd_tostring(notes, tags):
 	return '\n'.join(tostring.split('\n')[:-1])
 
 
-#----------------------rule-based solver----------------------------------------------
+#----------------------rule-based restoration---------------------------------------------
 #for dd with bullet points: assume that comma, linebreak and period are valid
 def restore_bullet_2sentences(notes, notes_tags, notes_seg_idxs, segment_spans):
 	sentences = []
@@ -745,23 +773,42 @@ def restore_bullet_2sentences(notes, notes_tags, notes_seg_idxs, segment_spans):
 	return sentences, tags, spans
 
 
-#notes to sentences in a dd
+#notes to sentences: concatenate ',' and ' ' in a sentence
 def notes_2sentences(notes, notes_tags, notes_seg_idxs, segment_spans):
+
 	sentences = []
 	tags = []
 	spans = []
 	prev = ''
 	prev_s = 10000000			
-	for (note, t, idxs) in zip(notes, notes_tags, notes_seg_idxs):
+	for i, (note, t, idxs) in enumerate(zip(notes[:-1], notes_tags[:-1], notes_seg_idxs[:-1])):
 
-		if t != '#' :	
-			s = segment_spans[idxs[0]][0]
-			e = segment_spans[idxs[-1]][1]
+		if t == '#' :
+			continue
+	
+		s = segment_spans[idxs[0]][0]
+		e = segment_spans[idxs[-1]][1]
 
 		if t == '_':
 			sentences += [note]
 			tags += [t]
 			spans += [(s, e)]
+			prev = ''
+			prev_s = 10000000
+			continue
+
+		elif t == '\n' or t == '.' or notes_tags[i+1] == '_' : 
+			if prev == '':
+				sentences += [note]
+				tags += ['.']  #[t]
+				spans += [(s, e)]
+			else:
+				sentences += [prev + note]				
+				tags += ['.'] 
+				spans += [(prev_s, e)]
+				prev = ''
+				prev_s = 10000000
+				continue
 
 		elif t == ',':
 			if prev == '':
@@ -780,24 +827,28 @@ def notes_2sentences(notes, notes_tags, notes_seg_idxs, segment_spans):
 				prev = prev + note + ' '
 				if s < prev_s:
 					prev_s = s
-		  
-		elif t == '\n' or t == '.': 
-			if prev == '':
-				sentences += [note]
-				tags += ['.']  #[t]
-				spans += [(s, e)]
-			else:
-				sentences += [prev + note]				
-				tags += ['.'] 
-				spans += [(prev_s, e)]
-				prev = ''
-				prev_s = 10000000
-				continue
-						
+
+	if notes_tags[-1] != '#':
+
+		#attaches the last note
+		note = notes[-1]
+		idxs = notes_seg_idxs[-1]
+		s = segment_spans[idxs[0]][0]
+		e = segment_spans[idxs[-1]][1]	
+
+		if prev == '':
+			sentences += [note]
+			tags += ['.']  #[t]
+			spans += [(s, e)]
+		else:
+			sentences += [prev + note]				
+			tags += ['.'] 
+			spans += [(prev_s, e)]
+					
 	return sentences, tags, spans
 	
 
-#for sentences with period: assume that comma and linebread are valid
+#for sentences with period: assume that comma and linebreak are valid
 def restore_period_2sentences(notes, notes_tags, notes_seg_idxs, segment_spans):
 	sentences = []
 	tags = []
@@ -805,9 +856,11 @@ def restore_period_2sentences(notes, notes_tags, notes_seg_idxs, segment_spans):
 	prev_tag = '#'
 	for (note, t, idxs) in zip(notes, notes_tags, notes_seg_idxs):
 
-		if t != '#' :	
-			s = segment_spans[idxs[0]][0]
-			e = segment_spans[idxs[-1]][1]
+		if t == '#' :
+			continue
+	
+		s = segment_spans[idxs[0]][0]
+		e = segment_spans[idxs[-1]][1]
 
 		if t == '_':
 			sentences += [note]
@@ -855,6 +908,204 @@ def comma2period(notes, notes_tags, notes_seg_idxs):
 					ret_idxs += [[span]]
 		
 	return ret_notes, ret_tags, ret_idxs
+
+
+#restore punctuation by rules: 
+#return 1) restored sentences, 2) line-break clf dd data and 3) comma clf dd data
+def restoration_by_rules(i_d):
+	(i, d) = i_d
+
+	page = d['discharge_diagnosis'].encode('utf-8')
+	#if i == 11485:
+	#	print page
+	dd = parse2segments(page)   
+	dd = segments2notes(dd, i, bad_len=48)
+	
+	dd_type = type_classifier(dd)
+		
+	#print dd	
+	dd.update({'dd_idx': i})
+	dd.update({'dd_type': dd_type})
+	d.update(dd)
+
+	linebreak_short_dd = None
+	linebreak_dd = None
+	restored_dd = None
+	
+	if dd_type == 'good' \
+	or dd_type == 'bullet_eq_period_bline' \
+	or dd_type == 'comma_0':
+		sentences, tags, spans = notes_2sentences(dd['notes'], dd['notes_tags'], \
+			dd['notes_seg_idxs'], dd['segment_spans'])
+
+	elif dd_type == 'bullet_eq_period' \
+	or dd_type == 'bullet_1':
+		sentences, tags, spans = restore_bullet_2sentences(dd['notes'], dd['notes_tags'],\
+			dd['notes_seg_idxs'], dd['segment_spans'])
+			  
+	elif dd_type == 'period_1_bullet_0':
+		sentences, tags, spans = restore_period_2sentences(dd['notes'], dd['notes_tags'], \
+			dd['notes_seg_idxs'], dd['segment_spans'])
+	   
+	#may be good
+	elif dd_type == 'comma_1':
+		#comma_dd = dd  
+		new_notes, tags, idxs = comma2period(dd['notes'], dd['notes_tags'], dd['notes_seg_idxs'])
+		sentences, tags, spans = notes_2sentences(new_notes, tags, idxs, dd['segment_spans'])
+		
+	#may be good
+	#if max_byte_len < 50:
+	elif dd_type == 'period_0_bullet_0_short':
+		#sentences, tags, spans = notes_2sentences(dd['notes'], dd['notes_tags'], \
+		#	dd['notes_seg_idxs'], dd['segment_spans'])
+		linebreak_short_dd = d
+		
+	#bad
+	elif dd_type == 'period_0_bullet_0_long':	  
+		linebreak_dd = d
+		
+	else:
+		print "ERROR: dd_type!"
+		sys.exit(0)
+
+	if linebreak_dd != None or linebreak_short_dd != None:
+		return (None, linebreak_dd, linebreak_short_dd, i)
+	
+	base = d['original_file_span_base']
+	original_spans = [(s + base, e + base) for (s, e) in spans]
+	restored_dd = {'sentences': sentences, 'sentences_tags': tags,'original_spans': original_spans}
+	
+	d.update(restored_dd)
+	restored_dd = d
+	
+	return (restored_dd, linebreak_dd, linebreak_short_dd, i)
+
+
+def split_to_restored_dd_comma_expanded_dd(input_dd_lst, check_sentence_len3=True):
+	separator = ','  
+  
+	restored_dd_lst = []
+	comma_expanded_dd_lst = []
+	head_tail_pairs = []
+	for dd in input_dd_lst:
+		n_comma = dd['info']['n_comma']
+
+		if n_comma == 0:
+			restored_dd_lst += [dd]		
+			continue
+
+		notes =[]
+		tags = []
+		seg_idxs = []
+		for (note, tag, idxs) in zip(dd['notes'],dd['notes_tags'],dd['notes_seg_idxs']): 
+
+			if tag == '_':
+				notes +=[note]
+				tags += [tag]
+				seg_idxs += [idxs]
+
+			elif tag in ['.', '\n', ' ']:
+				#print note, [tag], idxs
+				lst = note.split(',')
+				if len(lst) > 1:
+					for i, (n, idx) in enumerate(zip(lst[:-1], idxs[:-1])):
+						n = n.strip()
+						notes += [n]
+						seg_idxs += [[idx]]
+						if is_sentence_len3(n, lst[i+1].strip()) and check_sentence_len3 :
+							tags += ['.']
+						else:
+							tags += [separator]
+							head_tail_pairs += [n + separator + lst[i+1].strip()]
+						#print n,[tags[-1]],lst[i+1].strip(),'----------', dd['dd_idx']
+
+				n = lst[-1].strip()
+				idx = idxs[-1] 
+				notes += [n]
+				tags += [tag]
+				seg_idxs += [[idx]]
+
+		dd['notes'] = notes
+		dd['notes_tags'] = tags
+		dd['notes_seg_idxs'] = seg_idxs
+		comma_expanded_dd_lst += [dd]
+
+	return restored_dd_lst, comma_expanded_dd_lst, head_tail_pairs
+
+
+from dd_model_helper import *
+import time
+def get_restored_sentences(dd_lst):
+	t0 = time.time()
+
+	#1) restored by rules
+	ret_lst = map(lambda i_d: restoration_by_rules(i_d), enumerate(dd_lst))
+	#ret_lst = pool.map(restoration_by_rules, enumerate(dd_lst))
+
+	#split ret lists 
+	restored_dd_lst = []  #completed rule-based restoration dd list
+	linebreak_dd_lst = []  #needs ML classifier restoration dd list
+	linebreak_short_dd_lst = []	  #needs ML classifier restoration dd list
+	threads = []
+	for restored_dd, linebreak_dd, linebreak_short_dd, i in ret_lst:
+		
+		if restored_dd != None:
+			restored_dd_lst += [restored_dd]
+		if linebreak_dd != None:
+			linebreak_dd_lst += [linebreak_dd]
+		if linebreak_short_dd != None:
+			linebreak_short_dd_lst += [linebreak_short_dd]
+		
+		threads += [i]
+		
+	print "rule-based time:", time.time() - t0
+	print "done!"
+	print len(dd_lst)
+	print "restored:",len(restored_dd_lst)," ML linebreak_long:",len(linebreak_dd_lst),\
+		" ML linebreak_short:",len(linebreak_short_dd_lst)
+
+	t0 = time.time()
+
+	#2) restored by ML clf
+	comma_clf = load_model('model/comma_clf.model')
+	linebreak_clf = load_model('model/linebreak_clf.model')
+	
+	#linebreak_long_dd
+	restored_linebreak_long_dd_lst = restore_linebreak_by_clf(linebreak_dd_lst, linebreak_clf)
+	restored_linebreak_long_dd_lst, comma_expanded_dd_lst, head_tail_pairs = \
+			split_to_restored_dd_comma_expanded_dd(restored_linebreak_long_dd_lst)
+	restored_comma_dd_lst = restore_comma_by_clf(comma_expanded_dd_lst, head_tail_pairs, comma_clf)
+
+	restored_ml_clf_dd_lst = restored_linebreak_long_dd_lst + restored_comma_dd_lst
+
+	#linebreak_short_dd
+	restored_linebreak_short_dd_lst, comma_expanded_dd_lst, head_tail_pairs = \
+			split_to_restored_dd_comma_expanded_dd(linebreak_short_dd_lst)
+	restored_comma_dd_lst = restore_comma_by_clf(comma_expanded_dd_lst, head_tail_pairs, comma_clf)
+
+	restored_ml_clf_dd_lst += restored_linebreak_short_dd_lst + restored_comma_dd_lst
+
+	#to sentences
+	for dd in restored_ml_clf_dd_lst:
+		sentences, tags, spans = notes_2sentences(dd['notes'], dd['notes_tags'], \
+			dd['notes_seg_idxs'], dd['segment_spans']) 
+		base = dd['original_file_span_base']
+		original_spans = [(s + base, e + base) for (s, e) in spans]
+		d = {'sentences': sentences, 'sentences_tags': tags,'original_spans': original_spans}
+		dd.update(d)
+
+	#3) save to sentences json list:
+	sentences_dd_lst = [] 
+	for dd in dd_lst:
+		sentences_dd_lst += [{'report_id': dd['report_id'], 'sentences': dd['sentences'], \
+			'sentences_tags': dd['sentences_tags'], 'original_spans': dd['original_spans'], \
+			'original_file': dd['original_file'], 'original_file_idx': dd['original_file_idx'], \
+			'discharge_diagnosis': dd['discharge_diagnosis'], 'dd_idx': dd['dd_idx']}]
+	print "ML clf time:", time.time() - t0
+	print "done!"
+	print "sum:",len(restored_dd_lst + restored_ml_clf_dd_lst)
+
+	return sentences_dd_lst
 
 
 #run testing
@@ -1185,3 +1436,5 @@ Secondary
 			print '------------input-------------\n', page
 			print '------------output------------\n', sentence2string(sentences, tags)
 			print spans
+
+

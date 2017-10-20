@@ -1,4 +1,3 @@
-#from __future__ import print_function
 from dd_model_helper import *
 from dd_helper import *
 import time
@@ -51,7 +50,7 @@ def train_save_model(X, Y, X_test, Y_test, vocab2idx, tag_lst, parameters, windo
 
 
 def create_models(dd_lst, model_dir):
-	
+
 	#1) get sentences data from dd_lst
 	period_lst, comma_lst, heading_lower_lst = get_sentences_data(dd_lst)
 
@@ -85,8 +84,17 @@ def create_models(dd_lst, model_dir):
 
 	#8) save heading_lst
 	heading_str = '\n'.join(heading_lower_lst)
+	#print len(heading_lower_lst), heading_str[:160]
 	with open('model/heading_lower_lst.txt', 'w') as fd:
 	    fd.write(heading_str)
+
+	#9) save sentence_len3_lst
+	period_len3_lst = filter(lambda s: len(s.split()) < 4, period_lst)
+	period_len3_lst = map(lambda s: s.lower(), period_len3_lst )
+	period_len3_lst = list(set(period_len3_lst))
+	sentence_len3_str = '\n'.join(period_len3_lst)
+	with open('model/sentence_len3_lst.txt', 'w') as fd:
+	    fd.write(sentence_len3_str)
 
 
 if __name__ == '__main__':
@@ -112,7 +120,8 @@ if __name__ == '__main__':
 		file_name = data_path.split('/')[-1]
 		dd_lst, _ = extract_dd_raw(data_path)
 
-	#print json.dumps(dd_lst[520], sort_keys=True,indent=2)
+	if args.output_model_dir == "model/" and not os.path.isdir("model"):
+		os.system("mkdir model")
 
 	create_models(dd_lst, args.output_model_dir)
 	print "Done!"
