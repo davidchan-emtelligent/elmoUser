@@ -131,7 +131,11 @@ methods:
 	restore_period_2sentences(): restore punctuations for a summary with periods.
 	comma2period(): replace comma to period when summary has one line without period.
 	
-	usage:  from dd_helper import *
+	usage:  
+	from dd_helper import *
+	dicharge_diagnosis_lst, reports_lst = extract_dd_raw(data_path)
+	dicharge_diagnosis_sentence_lst = get_restored_sentences(dicharge_diagnosis_lst)
+	
 
 ##### 4. dd_model_helper.py
 
@@ -144,7 +148,8 @@ methods:
 	restore_linebreak_by_clf(): restore linebreaks with ML classifer.
 	restore_comma_by_clf(): restore commas with ML classifer.
 
-	usage:  from dd_model_helper import *
+	usage:  
+	from dd_model_helper import *
 
 ##### 5. MLP.py
 
@@ -164,104 +169,106 @@ Dynet RNN nueral network consists of train(), predict(), save() and load().
 
 ## Test case
 
-##### 1. Data:
+##### 1. Dataset
 
 We use the data set 'all_m3_CT_and_DS_reports.csv'. It has 203180 reports in which 99847 reports has non-empty discharge diagnoses(dd).
 
-##### 2. Restore punctuations for different types of problem:
+##### 2. Restore punctuations
+  
+python create_models.py -i 'all_m3_CT_and_DS_reports.csv'
+  
+python restore_punctuation.py -i 'all_m3_CT_and_DS_reports.csv'
 
-	'good': 35848
-
-	'bullet_1': 12048
-	
-		================
-		report_id:97981
-		================(70, bullet_eq_period)
-		
-		------------**input**-------------
-		
-		1.  Status post minimally invasive mitral valve repair via a
-
-		right thoracotomy.
-
-		2.  Hypothyroidism.
-		
-		------------**output**------------
-		
-		1. Status post minimally invasive mitral valve repair via a right thoracotomy.
-		2. Hypothyroidism.
-
-	'period_1_bullet_0': 6119
-	
-		================
-		report_id:97959
-		================(49, period_1_bullet_0)
-		
-		------------**input**-------------
-		
-		Gastric perforation from marginal
-
-		ulcer.
-		
-		------------**output**------------
-		
-		1. Gastric perforation from marginal ulcer.
-
-	'comma_1': 2205
-	
-		================
-		report_id:97965
-		================(55, comma_1)
-		
-		------------**input**-------------
-		
-		etoh intoxication, etoh withdrawal seizure
-		
-		------------**output**------------
-		
-		1. etoh intoxication.
-		2. etoh withdrawal seizure.
-
-	'period_0_bullet_0_short': 29207
-	
-		================
-		report_id:97910
-		================(0, period_0_bullet_0_short)
-		
-		------------**input**-------------
-		
-		Listeria meningitis
-
-		Ulcerative colitis
-		
-		------------**output**------------
-		
-		1. Listeria meningitis.
-		2. Ulcerative colitis.
+	================
+	report_id:98472
+	================(all_m3_CT_and_DS_reports.csv index:98471)
+	------------ input -------------
 
 
-	'period_0_bullet_0_long': 14420
-	
-		================
-		report_id:98176
-		================(247, period_0_bullet_0_long)
-		
-		------------input-------------
-		
-		Primary: Cellulitis
+	Primary: MAC pneumonia
 
-		Secondary: Atrial fibrillation, Chronic systolic heart failure,
+	Secondary: COPD, Hypertension, diarrhea
+	------------ output ------------
 
-		End stage renal disease on [**Name (NI) 2252**]
-		
-		------------output------------
-		
-		# Primary
-		1. Cellulitis.
-		# Secondary
-		2. Atrial fibrillation.
-		3. Chronic systolic heart failure.
-		4. End stage renal disease on [**Name (NI) 2252**].
+	# Primary
+
+	1. MAC pneumonia.
+
+	# Secondary
+
+	2. COPD.
+	3. Hypertension.
+	4. diarrhea.
+	[(8030, 8037), (8039, 8052), (8054, 8063), (8065, 8069), (8071, 8083), (8085, 8093)]
+
+	================
+	report_id:98718
+	================(all_m3_CT_and_DS_reports.csv index:98717)
+	------------ input -------------
+
+
+	Primary Diagnosis: Infected pancreatic necrosis, cholelithiasis
+
+	Secondary Diagnoses: GERD, Rheumatoid arthritis, IBS
+	------------ output ------------
+
+	# Primary Diagnosis
+
+	1. Infected pancreatic necrosis.
+	2. cholelithiasis.
+
+	# Secondary Diagnoses
+
+	3. GERD.
+	4. Rheumatoid arthritis.
+	5. IBS.
+	[(12207, 12224), (12226, 12254), (12256, 12270), (12272, 12291), (12293, 12297), (12299, 12319), (12321, 12324)]
+
+	================
+	report_id:98733
+	================(all_m3_CT_and_DS_reports.csv index:98732)
+	------------ input -------------
+
+
+	Primary: NSTEMI (3v CAD)
+
+	Secondary: ESRD, CHF, DM
+	------------ output ------------
+
+	# Primary
+
+	1. NSTEMI (3v CAD).
+
+	# Secondary
+
+	2. ESRD.
+	3. CHF.
+	4. DM.
+	[(7158, 7165), (7167, 7182), (7184, 7193), (7195, 7199), (7201, 7204), (7206, 7208)]
+
+	================
+	report_id:98791
+	================(all_m3_CT_and_DS_reports.csv index:98790)
+	------------ input -------------
+
+
+	Primary: Septic Shock
+
+	Secondary: HIV, invasive candidiasis
+	------------ output ------------
+
+	# Primary
+
+	1. Septic Shock.
+
+	# Secondary
+
+	2. HIV.
+	3. invasive candidiasis.
+	[(5925, 5932), (5934, 5946), (5948, 5957), (5959, 5962), (5964, 5984)]
+
+	discharge diagnoses are saved to dd_sentences_lst.json
+	Done!
 
  
 ##### 3. ML classifier: comma_clf.model
