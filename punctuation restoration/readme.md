@@ -123,6 +123,7 @@ Support 1. and 2.
 
 methods:
 
+	get_restored_sentences(): the top-level method to get a list of reformatted discharge diagnoses dicts.
 	parse2segments(): parse a raw summary to segments with punctuations at 2 ends.
 	segments2notes(): remove existing bullet points, assign tags for each segment and get the punctuation statistic.
 	type_classifier(): classify the type of problem for a summary.
