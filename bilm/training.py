@@ -878,9 +878,10 @@ def train(options, data, n_gpus, tf_save_dir, tf_log_dir,
             if batch_no % 1 == 0:
                 # write the summaries to tensorboard and display perplexity
                 summary_writer.add_summary(ret[1], batch_no)
-                print("\rEpoch:%d/%d  batch:%d/%d  perplexity:%.2f  time:%.0f      "%\
+                dt = time.time() - t1
+                print("\rEpoch:%d/%d  batch:%d/%d  perplexity:%.2f  tokens_per_sec:%.0f  time:%.0f   "%\
 			(batch_no/n_batches_per_epoch + 1, options['n_epochs'], batch_no, \
-			n_batches_total, ret[2], time.time() - t1), end=" ")
+			n_batches_total, ret[2], n_tokens_per_batch/dt, dt), end=" ")
                 sys.stdout.flush()
 
             if (batch_no % check_point_every == 0) or (batch_no == n_batches_total):
