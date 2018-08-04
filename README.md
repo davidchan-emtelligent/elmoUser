@@ -56,11 +56,11 @@ export CUDA_VISIBLE_DEVICES=0
 
 In options.json:
 
-  batch_no = n_epochs*n_batches_per_epoch 
+	batch_no = n_epochs*n_batches_per_epoch 
 
-  n_batches_per_epoch = n_train_tokens/(batch_size*unroll_steps*n_gpus)
+	n_batches_per_epoch = n_train_tokens/(batch_size*unroll_steps*n_gpus)
 
-  epoch = batch_no/n_batches_per_epoch + 1
+	epoch = batch_no/n_batches_per_epoch + 1
 
 
 
