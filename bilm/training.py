@@ -783,8 +783,8 @@ def train(options, data, n_gpus, tf_save_dir, tf_log_dir,
         n_tokens_per_batch = batch_size * unroll_steps * n_gpus
         n_batches_per_epoch = int(n_train_tokens / n_tokens_per_batch)
         n_batches_total = options['n_epochs'] * n_batches_per_epoch
-        print("Training for %s epochs and %s batches, using gpu %d" % (
-            options['n_epochs'], n_batches_total, n_gpus))
+        print("Training for %s epochs and %s batches(%d tokens/b), using %d gpu" % (
+            options['n_epochs'], n_batches_total, n_tokens_per_batch, n_gpus))
 
         # get the initial lstm states
         init_state_tensors = []
@@ -879,9 +879,9 @@ def train(options, data, n_gpus, tf_save_dir, tf_log_dir,
                 # write the summaries to tensorboard and display perplexity
                 summary_writer.add_summary(ret[1], batch_no)
                 dt = time.time() - t1
-                print("\rEpoch:%d/%d  batch:%d/%d  perplexity:%.2f  tokens_per_sec:%.0f  time:%.0f   "%\
+                print("\rEpoch:%d/%d  batch:%d/%d  perplexity:%.2f  batch_per_sec:%.2f  time:%.0f   "%\
 			(batch_no/n_batches_per_epoch, options['n_epochs'], batch_no, \
-			n_batches_total, ret[2], n_tokens_per_batch/dt, dt), end=" ")
+			n_batches_total, ret[2], batch_no/dt, dt), end=" ")
                 sys.stdout.flush()
 
             if (batch_no % check_point_every == 0) or (batch_no == n_batches_total):
