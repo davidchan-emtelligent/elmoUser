@@ -42,25 +42,25 @@ export CUDA_VISIBLE_DEVICES=0
 
 ### Args:
 
-  1) vocab_file: 
+1) vocab_file: 
 
 	vocab_file.txt (not change for a model)
 
-  2) train_prefix: 
+2) train_prefix: 
 
 	dir1/* (if retrain dir2/*, dir3/* .... replace each retrain)
 
-  3) save_dir:
+3) save_dir:
 
 	checkpoint (same options.json, only n_train_tokens and n_epochs can be changed)
 
 In options.json:
 
-  4) batch_no = n_epochs*n_batches_per_epoch 
+  batch_no = n_epochs*n_batches_per_epoch 
 
-  5) n_batches_per_epoch=n_train_tokens/(batch_size*unroll_steps*n_gpus)
+  n_batches_per_epoch = n_train_tokens/(batch_size*unroll_steps*n_gpus)
 
-  5) epoch    = batch_no/n_batches_per_epoch + 1
+  epoch = batch_no/n_batches_per_epoch + 1
 
 
 
