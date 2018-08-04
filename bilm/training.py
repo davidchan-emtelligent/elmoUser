@@ -783,7 +783,7 @@ def train(options, data, n_gpus, tf_save_dir, tf_log_dir,
         n_tokens_per_batch = batch_size * unroll_steps * n_gpus
         n_batches_per_epoch = int(n_train_tokens / n_tokens_per_batch)
         n_batches_total = options['n_epochs'] * n_batches_per_epoch
-        print("Training for %s epochs and %s batches(%d tokens/b), using %d gpu" % (
+        print("Training for %s epochs and %s batches(%d tokens/batch), using %d gpu" % (
             options['n_epochs'], n_batches_total, n_tokens_per_batch, n_gpus))
 
         # get the initial lstm states
@@ -879,9 +879,9 @@ def train(options, data, n_gpus, tf_save_dir, tf_log_dir,
                 # write the summaries to tensorboard and display perplexity
                 summary_writer.add_summary(ret[1], batch_no)
                 dt = time.time() - t1
-                print("\rEpoch:%d/%d  batch:%d/%d  perplexity:%.2f  batch_per_sec:%.2f  time:%.0f   "%\
+                print("\rEpoch:%d/%d  batch:%d/%d  perplexity:%.2f  sec_per_batch:%.1f  time:%.1f      "%\
 			(batch_no/n_batches_per_epoch, options['n_epochs'], batch_no, \
-			n_batches_total, ret[2], batch_no/dt, dt), end=" ")
+			n_batches_total, ret[2], dt/batch_no, dt), end=" ")
                 sys.stdout.flush()
 
             if (batch_no % check_point_every == 0) or (batch_no == n_batches_total):
@@ -890,7 +890,7 @@ def train(options, data, n_gpus, tf_save_dir, tf_log_dir,
                 saver.save(sess, checkpoint_path, global_step=global_step)
 
             if batch_no == n_batches_total:
-                print("\nLast checkpoint save to:", checkpoint_path, sess.run(global_step))
+                print("\nLast checkpoint save to:%s %.0f"%(checkpoint_path, sess.run(global_step)))
                 print("Done training!")
                 break
 
