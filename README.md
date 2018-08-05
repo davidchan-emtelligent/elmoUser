@@ -37,8 +37,8 @@ export CUDA_VISIBLE_DEVICES=0
 ### Get weights:
 
 	python bin/dump_weights.py \
-	    --save_dir checkpoint
-	    --outfile weights.hdf5
+	    --save_dir checkpoint \
+	    --outfile checkpoint/weights.hdf5
 
 ### Args:
 
