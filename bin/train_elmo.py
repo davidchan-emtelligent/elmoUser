@@ -1,6 +1,7 @@
 import argparse
 
 import numpy as np
+from .tokens_count import get_tokens_count
 
 from bilm.training import train, load_options_latest_checkpoint, load_vocab
 from bilm.data import BidirectionalLMDataset
@@ -16,6 +17,7 @@ def main(args):
     # number of tokens in training data (this for 1B Word Benchmark)
     # batch_no = n_epochs*n_train_tokens/(batch_size*unroll_steps*n_gpus)
     n_train_tokens = 25600 #  => 100 n_batch  #filtered 1330337  #1B 768648884  
+    n_train_tokens = get_tokens_count(args.train_prefix)
 
     options = {
      'bidirectional': True,

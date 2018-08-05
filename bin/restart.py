@@ -2,6 +2,7 @@
 
 import argparse
 import numpy as np
+from .tokens_count import get_tokens_count
 
 from bilm.training import train, load_options_latest_checkpoint, load_vocab
 from bilm.data import LMDataset, BidirectionalLMDataset
@@ -37,6 +38,8 @@ def main(args):
         options['n_epochs'] = args.n_epochs
     if args.batch_size > 0:
         options['batch_size'] = args.batch_size
+
+    options['n_train_tokens'] =  get_tokens_count(args.train_prefix)
 
     train(options, data, args.n_gpus, tf_save_dir, tf_log_dir,
           restart_ckpt_file=ckpt_file)
