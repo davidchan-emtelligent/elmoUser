@@ -1,0 +1,6 @@
+
+python nlp/bin/train_elmo.py --train_prefix='/shared/dropbox/ctakes_conll/tokenized_text/ds_sentences_0/*' --vocab_file ctakes_vocabs.txt --save_dir checkpoint
+
+python nlp/bin/restart.py --train_prefix='/shared/dropbox/ctakes_conll/tokenized_text/ds_sentences_1/*' --vocab_file ctakes_vocabs.txt --save_dir checkpoint
+
+python ../bin/run_restart.py  --vocab_file ctakes_vocabs.txt --save_dir ../checkpoint --prefixes_dir prefixes_tokens_count.txt --span 4:36
