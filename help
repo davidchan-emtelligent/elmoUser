@@ -32,4 +32,4 @@ python bin/run_test.py \
 --vocab_file data/vocab_filtered.txt \
 --save_dir checkpoint
 
-
+python nlp/bin/dump_weights.py --save_dir checkpoint --outfile checkpoint/weights.hdf5
