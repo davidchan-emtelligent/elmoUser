@@ -4,7 +4,7 @@ Reference: https://github.com/allenai/bilm-tf
 
 ### Installateion:
 
-virtualenv venv3
+virtualenv -p python3 venv3
 
 source venv3/bin/activate
 
@@ -60,7 +60,7 @@ In options.json:
 
 	n_batches_per_epoch = n_train_tokens/(batch_size*unroll_steps*n_gpus)
 
-	epoch = batch_no/n_batches_per_epoch + 1
+	epoch = batch_no/n_batches_per_epoch
 
 
 
