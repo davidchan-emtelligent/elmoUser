@@ -22,10 +22,10 @@ def main(args):
         if prefix[:5] == "total":
             continue
         prefix = os.path.join(args.root, prefix.split()[0]) + "/*"
-        run_str = "python restart.py --train_prefix=%s --vocab_file %s --save_dir %s"%(prefix, args.vocab_file, args.save_dir)
+        run_str = "python nlp/bin/restart.py --train_prefix=%s --vocab_file %s --save_dir %s --n_gpus %d"%(prefix, args.vocab_file, args.save_dir, args.n_gpus)
 
         print(run_str)
-        #os.system(run_str)
+        os.system(run_str)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -33,6 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('--vocab_file', help='Vocabulary file')
     parser.add_argument('--root', default='/shared/dropbox/ctakes_conll/tokenized_text', help='data root')
     parser.add_argument('--prefixes_dir', default='prefixes_tokens_count.txt', help='prefixes_dir')
+    parser.add_argument('--n_gpus', type=int, default=1)
     parser.add_argument('--span', type=str, default='0:1')
 
     args = parser.parse_args()
