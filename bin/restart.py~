@@ -8,7 +8,7 @@ from bilm.data import LMDataset, BidirectionalLMDataset
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
-from helper import get_tokens_count
+from tokens_count import get_tokens_count
 
 def main(args):
     options, ckpt_file = load_options_latest_checkpoint(args.save_dir)
