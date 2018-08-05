@@ -5,7 +5,7 @@ def clean_checkpoint(checkpoint_path):
     fs = os.listdir(checkpoint_path)
     with open(checkpoint_path + "/checkpoint", "r") as fd:
         lines = fd.read().split('\n')
-    valid_chpt = lines[0].split(":")[-1].strip().replace('"', '')
+    valid_ckpt = lines[0].split(":")[-1].strip().replace('"', '')
     for f in fs:
 	if f == 'checkpoint' \
 	or f.endswith('json') \
