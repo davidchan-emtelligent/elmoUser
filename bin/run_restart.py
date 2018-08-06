@@ -1,6 +1,7 @@
 """
 
 python nlp/bin/run_restart.py  --vocab_file ctakes_vocabs.txt --save_dir nlp/checkpoint --root /home/lca80/Desktop/data/emtell/PMC/txt --prefixes_dir prefixes_tokens_count.txt --span 0:8
+python nlp/bin/run_restart.py  --vocab_file ctakes_vocabs.txt --save_dir checkpoint --prefixes_dir prefixes_tokens_count.txt --span 34:55
 
 """
 import os
