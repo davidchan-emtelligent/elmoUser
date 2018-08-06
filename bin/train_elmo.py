@@ -8,7 +8,7 @@ from bilm.data import BidirectionalLMDataset
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
-from tokens_count import get_tokens_count
+from helper import get_tokens_count
 
 def main(args):
     # load the vocab

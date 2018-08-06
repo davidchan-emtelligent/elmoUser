@@ -16,4 +16,18 @@ def clean_checkpoint(checkpoint_path):
 		if len(f.split(valid_ckpt)) == 1:
 			run_str = "rm %s"%(os.path.join(checkpoint_path, f))
 			print(run_str)
-			#os.system(run_str)
+			os.system(run_str)
+
+train_prefix = "/shared/dropbox/ctakes_conll/tokenized_text/ds_sentences_0"
+
+def func(f):
+	  with open(f, "r") as fd:
+	  	  tokens= fd.read().strip().split()
+	  return len(tokens)
+
+def get_tokens_count(train_prefix):
+	  train_prefix = train_prefix.replace("*", "")
+	  fs = [os.path.join(train_prefix, f) for f in os.listdir(train_prefix)]
+	  ret_lst = multiprocessing.Pool().map(func, fs)
+
+	  return (sum(ret_lst))

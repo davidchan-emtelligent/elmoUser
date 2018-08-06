@@ -10,6 +10,8 @@ import argparse
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 
+from helper import clean_checkpoint
+
 def main(args):
     (s, e) = args.span.split(":")
     s, e = int(s), int(e)
@@ -26,6 +28,7 @@ def main(args):
 
         print(run_str)
         os.system(run_str)
+        clean_checkpoint(args.save_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
