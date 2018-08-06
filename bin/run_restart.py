@@ -29,11 +29,11 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--save_dir', help='Location of checkpoint files')
-    parser.add_argument('--vocab_file', help='Vocabulary file')
+    parser.add_argument('--save_dir', default='checkpoint', help='Location of checkpoint files')
+    parser.add_argument('--vocab_file', default='vocabs.txt', help='Vocabulary file')
     parser.add_argument('--root', default='/shared/dropbox/ctakes_conll/tokenized_text', help='data root')
     parser.add_argument('--prefixes_dir', default='prefixes_tokens_count.txt', help='prefixes_dir')
-    parser.add_argument('--n_gpus', type=int, default=1)
+    parser.add_argument('--n_gpus', type=int, default=2)
     parser.add_argument('--span', type=str, default='0:1')
 
     args = parser.parse_args()
