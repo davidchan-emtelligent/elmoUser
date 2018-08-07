@@ -67,11 +67,11 @@ Provide a list of tokenized sentences
 
 2 train_prefix: 
 
-	dir1/* (if retrain dir2/*, dir3/* .... replace each retrain)
+	dir/* (train all files in dir/)
 
 3 save_dir:
 
-	checkpoint (same options.json, only n_train_tokens and n_epochs can be changed)
+	checkpoint (same options.json which created when first train_elmo, only n_train_tokens and n_epochs can be changed when restart)
 
 In options.json:
 
