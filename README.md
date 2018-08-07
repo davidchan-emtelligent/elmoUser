@@ -2,6 +2,8 @@
 
 Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are modified from elmo/bilm-tf.
 
+<br>
+
 ### Installateion:
 
 virtualenv -p python3 venv3
@@ -10,9 +12,13 @@ source venv3/bin/activate
 
 pip install -e .
 
+<br>
+
 ### Test Installateion:
 
 	python -m unittest discover tests/
+
+<br>
 
 ### Train:
 	export CUDA_VISIBLE_DEVICES=0,1
@@ -23,12 +29,16 @@ pip install -e .
 	--save_dir checkpoint \
 	--config_file bin/resources/small_config.json
 
+<br>
+
 ### Test:
 
 	python bin/run_test.py \
 	--test_prefix='tests/data/heldout_filtered/*' \
 	--vocab_file testsdata/vocab_filtered.txt \
 	--save_dir checkpoint
+
+<br>
 
 ### Retrain:
 
@@ -44,12 +54,16 @@ Auto retrain a sequence of training dirs with span
 	--save_dir checkpoint \
 	--prefixes_dir tests/data/training_dir.paths \
 	--span
-	
+
+<br>
+
 ### Get weights:
 
 	python bin/dump_weights.py \
 	--save_dir checkpoint \
 	--outfile checkpoint/weights.hdf5
+
+<br>
 
 ### Get vectors:
 Provide a list of tokenized sentences
@@ -58,6 +72,8 @@ Provide a list of tokenized sentences
 	--vocab_file tests/data/vocab_filtered.txt \
 	--save_dir checkpoint \
 	--input_text tests/data/tokenized_sentences.txt		
+
+<br>
 
 ### Args:
 
