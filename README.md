@@ -1,6 +1,6 @@
 ## bilm
 
-Reference: https://github.com/allenai/bilm-tf
+Using embedding from elmo https://github.com/allenai/bilm-tf
 
 ### Installateion:
 
