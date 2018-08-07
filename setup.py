@@ -1,13 +1,18 @@
 #!/usr/bin/python
-import setuptools
+from setuptools import setup, find_packages
 
-setuptools.setup(
+setup(
     name='bilm',
     version='0.1',
     url='http://github.com/allenai/bilm-tf',
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     tests_require=[],
     zip_safe=False,
     entry_points='',
+    install_requires=[
+        'typing',
+        'tensorflow-gpu==1.2',
+        'h5py',
+        ],
 )
 
