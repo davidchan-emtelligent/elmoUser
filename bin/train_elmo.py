@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import argparse
 import numpy as np
 
@@ -11,60 +12,33 @@ sys.path.append(current_dir)
 from helper import get_tokens_count
 
 def main(args):
+
+    # define the options
+    config_file = args.config_file
+    if config_file == None:
+        config_file = os.path.join(current_dir, "resources/default_config.json")
+    with open(config_file, "r") as fj:
+        options = json.load(fj)
+
     # load the vocab
     vocab = load_vocab(args.vocab_file, 50)
 
-    # define the options
-    batch_size = 128  # batch size for each GPU
-    n_gpus = 1  #3
-
     # number of tokens in training data (this for 1B Word Benchmark)
     # batch_no = n_epochs*n_train_tokens/(batch_size*unroll_steps*n_gpus)
-    n_train_tokens = 25600 #  => 100 n_batch  #filtered 1330337  #1B 768648884  
-    n_train_tokens = get_tokens_count(args.train_prefix)
+    #25600  => 100 n_batch  #example filtered 1330337  #1B 768648884
+    if 'n_train_tokens' not in options:
+        options['n_train_tokens'] = get_tokens_count(args.train_prefix)
+    else:
+        print("Warning: using options['n_train_tokens']:", options['n_train_tokens'])  
 
-    options = {
-     'bidirectional': True,
-
-     'char_cnn': {'activation': 'relu',
-      'embedding': {'dim': 16},
-      'filters': [[1, 32],
-       [2, 32],
-       [3, 64],
-       [4, 128],
-       [5, 256],
-       [6, 512],
-       [7, 1024]],
-      'max_characters_per_token': 50,
-      'n_characters': 261,
-      'n_highway': 2},
-    
-     'dropout': 0.1,
-    
-     'lstm': {
-      'cell_clip': 3,
-      'dim': 4096,
-      'n_layers': 2,
-      'proj_clip': 3,
-      'projection_dim': 512,
-      'use_skip_connections': True},
-    
-     'all_clip_norm_val': 10.0,
-    
-     'n_epochs': 10,
-     'n_train_tokens': n_train_tokens,
-     'batch_size': batch_size,
-     'n_tokens_vocab': vocab.size,
-     'unroll_steps': 20,
-     'n_negative_samples_batch': 8192,
-    }
-
+    n_gpus = options['n_gpus']
+    options['n_tokens_vocab'] = vocab.size
     prefix = args.train_prefix
-    data = BidirectionalLMDataset(prefix, vocab, test=False,
-                                      shuffle_on_load=True)
-
+    data = BidirectionalLMDataset(prefix, vocab, test=False, shuffle_on_load=True)
     tf_save_dir = args.save_dir
     tf_log_dir = args.save_dir
+
+    print("options:", options)
     train(options, data, n_gpus, tf_save_dir, tf_log_dir)
 
 
@@ -73,6 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_dir', help='Location of checkpoint files')
     parser.add_argument('--vocab_file', help='Vocabulary file')
     parser.add_argument('--train_prefix', help='Prefix for train files')
+    parser.add_argument('--config_file', default=None, help='Config.json file')
 
     args = parser.parse_args()
     main(args)

@@ -6,6 +6,9 @@ setup(
     version='0.1',
     url='http://github.com/allenai/bilm-tf',
     packages=find_packages(),
+    package_data={
+	'bilm': ['resources/*'],
+    },
     tests_require=[],
     zip_safe=False,
     entry_points='',

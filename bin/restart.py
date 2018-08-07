@@ -34,7 +34,7 @@ def main(args):
     tf_save_dir = args.save_dir
     tf_log_dir = args.save_dir
 
-    # set optional inputs
+    # set optional inputs to overide the otpions.json
     if args.n_train_tokens > 0:
         options['n_train_tokens'] = args.n_train_tokens
     if args.n_epochs > 0:
