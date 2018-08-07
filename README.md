@@ -20,7 +20,7 @@ export CUDA_VISIBLE_DEVICES=0
 	python bin/train_elmo.py \
 	--train_prefix='tests/data/training_filtered/*' \
 	--vocab_file testsdata/vocab_filtered.txt \
-	--save_dir checkpoint
+	--save_dir checkpoint \
 	--config_file bin/resources/small_config.json
 
 ### Test:
