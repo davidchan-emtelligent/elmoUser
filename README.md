@@ -12,10 +12,10 @@ pip install -e .
 
 ### Test Installateion:
 
-python -m unittest discover tests/
+	python -m unittest discover tests/
 
 ### Train:
-export CUDA_VISIBLE_DEVICES=0
+	export CUDA_VISIBLE_DEVICES=0,1
 
 	python bin/train_elmo.py \
 	--train_prefix='tests/data/training_filtered/*' \
@@ -36,24 +36,40 @@ export CUDA_VISIBLE_DEVICES=0
 	--train_prefix='tests/data/training_filtered/*' \
 	--vocab_file tests/data/vocab_filtered.txt \
 	--save_dir checkpoint
+	
+Auto retrain a sequence of training dirs with span
 
+	python bin/run_restart.py  \
+	--vocab_file tests/data/vocab_filtered.txt \
+	--save_dir checkpoint \
+	--prefixes_dir tests/data/training_dir.paths \
+	--span
+	
 ### Get weights:
 
 	python bin/dump_weights.py \
-	    --save_dir checkpoint \
-	    --outfile checkpoint/weights.hdf5
+	--save_dir checkpoint \
+	--outfile checkpoint/weights.hdf5
+
+### Get vectors:
+Provide a list of tokenized sentences
+
+	python bin/get_vecs.py \
+	--vocab_file tests/data/vocab_filtered.txt \
+	--save_dir checkpoint \
+	--input_text tests/data/tokenized_sentences.txt		
 
 ### Args:
 
-1) vocab_file: 
+1 vocab_file: 
 
 	vocab_file.txt (not change for a model)
 
-2) train_prefix: 
+2 train_prefix: 
 
 	dir1/* (if retrain dir2/*, dir3/* .... replace each retrain)
 
-3) save_dir:
+3 save_dir:
 
 	checkpoint (same options.json, only n_train_tokens and n_epochs can be changed)
 
