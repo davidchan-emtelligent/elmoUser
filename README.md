@@ -18,23 +18,23 @@ python -m unittest discover tests/
 export CUDA_VISIBLE_DEVICES=0
 
 	python bin/train_elmo.py \
-	--train_prefix='test/data/training_filtered/*' \
-	--vocab_file test/data/vocab_filtered.txt \
+	--train_prefix='tests/data/training_filtered/*' \
+	--vocab_file testsdata/vocab_filtered.txt \
 	--save_dir checkpoint
 	--config_file bin/resources/small_config.json
 
 ### Test:
 
 	python bin/run_test.py \
-	--test_prefix='test/data/heldout_filtered/*' \
-	--vocab_file test/data/vocab_filtered.txt \
+	--test_prefix='tests/data/heldout_filtered/*' \
+	--vocab_file testsdata/vocab_filtered.txt \
 	--save_dir checkpoint
 
 ### Retrain:
 
 	python bin/restart.py \
-	--train_prefix='test/data/training_filtered/*' \
-	--vocab_file test/data/vocab_filtered.txt \
+	--train_prefix='tests/data/training_filtered/*' \
+	--vocab_file tests/data/vocab_filtered.txt \
 	--save_dir checkpoint
 
 ### Get weights:
