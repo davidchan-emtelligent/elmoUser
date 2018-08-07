@@ -1,6 +1,6 @@
 ## bilm
 
-Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are modified from elmo/bilm-tf from elmo.
+Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are modified from elmo/bilm-tf.
 
 ### Installateion:
 
