@@ -21,7 +21,7 @@ export CUDA_VISIBLE_DEVICES=0
 	--train_prefix='data/training_filtered/*' \
 	--vocab_file data/vocab_filtered.txt \
 	--save_dir checkpoint
-	--config_file resources/small_config.json
+	--config_file bin/resources/small_config.json
 
 ### Test:
 
