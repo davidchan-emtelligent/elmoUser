@@ -8,9 +8,11 @@ virtualenv -p python3 venv3
 
 source venv3/bin/activate
 
-pip install tensorflow-gpu==1.2 h5py
-
 pip install -e .
+
+### Test Installateion:
+
+python -m unittest discover tests/
 
 ### Train:
 export CUDA_VISIBLE_DEVICES=0
@@ -19,6 +21,7 @@ export CUDA_VISIBLE_DEVICES=0
 	--train_prefix='data/training_filtered/*' \
 	--vocab_file data/vocab_filtered.txt \
 	--save_dir checkpoint
+	--config_file resources/small_config.json
 
 ### Test:
 
