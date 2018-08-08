@@ -11,7 +11,7 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'trainer=elmoUser.elmoUser:main',
+            'trainer=elmoUser.trainer:main',
         ],
     },
     package_data={
