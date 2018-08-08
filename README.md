@@ -65,7 +65,7 @@ Auto retrain a sequence of training dirs with span
 ### Get vectors:
 Provide a list of tokenized sentences.
 
-	python bin/get_vecs.py \
+	python bin/elmo_embedding.py \
 	--save_dir checkpoint \
 	--input_text tests/data/tokenized_sentences.txt	
 	
