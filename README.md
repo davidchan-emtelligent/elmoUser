@@ -1,21 +1,27 @@
-## bilm
+## elmoUser
 
-Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are modified from elmo/bilm-tf from elmo.
+Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are modified from elmo/bilm-tf.
 
-### Installateion:
+<br>
 
-virtualenv -p python3 venv3
+### Installation:
 
-source venv3/bin/activate
+	virtualenv -p python3 venv3
 
-pip install -e .
+	source venv3/bin/activate
 
-### Test Installateion:
+	pip install -e .
 
-python -m unittest discover tests/
+<br>
+
+### Test Installation:
+
+	python -m unittest discover tests/
+
+<br>
 
 ### Train:
-export CUDA_VISIBLE_DEVICES=0
+	export CUDA_VISIBLE_DEVICES=0,1
 
 	python bin/train_elmo.py \
 	--train_prefix='tests/data/training_filtered/*' \
@@ -23,39 +29,68 @@ export CUDA_VISIBLE_DEVICES=0
 	--save_dir checkpoint \
 	--config_file bin/resources/small_config.json
 
+<br>
+
 ### Test:
 
 	python bin/run_test.py \
 	--test_prefix='tests/data/heldout_filtered/*' \
-	--vocab_file testsdata/vocab_filtered.txt \
 	--save_dir checkpoint
+
+<br>
 
 ### Retrain:
 
 	python bin/restart.py \
 	--train_prefix='tests/data/training_filtered/*' \
-	--vocab_file tests/data/vocab_filtered.txt \
 	--save_dir checkpoint
+	
+Auto retrain a sequence of training dirs with span
+
+	python bin/run_restart.py  \
+	--save_dir checkpoint \
+	--prefixes_dir tests/data/training_dir.paths \
+	--span 1:4
+
+<br>
 
 ### Get weights:
 
 	python bin/dump_weights.py \
-	    --save_dir checkpoint \
-	    --outfile checkpoint/weights.hdf5
+	--save_dir checkpoint \
+	--outfile checkpoint/weights.hdf5
+
+<br>
+
+### Get vectors:
+Provide a list of tokenized sentences.
+
+	python bin/elmo_embedding.py \
+	--save_dir checkpoint \
+	--input_text tests/data/tokenized_sentences.txt	
+	
+Or:
+
+	from bilm import ElmoEmbedding
+	elmo = ElmoEmbedding(save_dir)
+	elmo_context_vecs, context_tokens, context_ids = elmo(tokenized_sentences)
+	
+<br>
 
 ### Args:
 
-1) vocab_file: 
+1 vocab_file: 
 
-	vocab_file.txt (not change for a model)
+	vocabs.txt (will be saved in save_dir and not be changed)
 
-2) train_prefix: 
+2 train_prefix: 
 
-	dir1/* (if retrain dir2/*, dir3/* .... replace each retrain)
+	dir/* (train all files in dir/)
 
-3) save_dir:
+3 save_dir:
 
-	checkpoint (same options.json, only n_train_tokens and n_epochs can be changed)
+	checkpoint (save model, vocabs.txt, options.json, weights.hdf5)
+	model is no needed to get embedding vectors.
 
 In options.json:
 
