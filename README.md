@@ -69,9 +69,9 @@ Provide a list of tokenized sentences.
 	--save_dir checkpoint \
 	--input_text tests/data/tokenized_sentences.txt	
 	
-Usage:
+Or:
 
-	from elmoUser import ElmoEmbedding
+	from bilm import ElmoEmbedding
 	elmo = ElmoEmbedding(save_dir)
 	elmo_context_vecs, context_tokens, context_ids = elmo(tokenized_sentences)
 	
@@ -81,7 +81,7 @@ Usage:
 
 1 vocab_file: 
 
-	vocab_file.txt (not change for a model)
+	vocabs.txt (will be saved in save_dir and not be changed)
 
 2 train_prefix: 
 
@@ -89,7 +89,8 @@ Usage:
 
 3 save_dir:
 
-	checkpoint (same options.json which created when first train_elmo, only n_train_tokens and n_epochs can be changed when restart)
+	checkpoint (save model, vocabs.txt, options.json, weights.hdf5)
+	model is no needed to get embedding vectors.
 
 In options.json:
 
