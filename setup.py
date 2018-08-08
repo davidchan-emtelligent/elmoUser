@@ -2,20 +2,24 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='bilm',
+    name='elmoUser',
     version='0.1',
-    url='http://github.com/allenai/bilm-tf',
-    packages=find_packages(),
-    package_data={
-	'bilm': ['resources/*'],
+    python_requires='>=3.4',
+
+    packages=find_packages(where='src'),
+    package_dir={'': 'src'},
+
+    entry_points={
+        'console_scripts': [
+            'trainer=elmoUser.elmoUser:main',
+        ],
     },
-    tests_require=[],
-    zip_safe=False,
-    entry_points='',
+    package_data={
+	'elmoUser': ['resources/*'],
+    },
+
     install_requires=[
-        'typing',
-        'tensorflow-gpu==1.2',
-        'h5py',
+        'bilm',
         ],
 )
 
