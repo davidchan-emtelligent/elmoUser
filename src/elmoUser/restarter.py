@@ -9,7 +9,7 @@ from bilm.data import LMDataset, BidirectionalLMDataset
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
-from helper import get_tokens_count, load_options, save_options
+from helper import get_tokens_count, clean_checkpoint, load_options, save_options
 
 def resume(options, prefix, vocab, n_gpus, tf_save_dir, tf_log_dir, ckpt_file):
 	kwargs = {
@@ -23,9 +23,10 @@ def resume(options, prefix, vocab, n_gpus, tf_save_dir, tf_log_dir, ckpt_file):
 		data = LMDataset(prefix, vocab, **kwargs)
 
 	train(options, data, n_gpus, tf_save_dir, tf_log_dir, restart_ckpt_file=ckpt_file)
-	
+	clean_checkpoint(tf_save_dir)
 
-def main(args):
+
+def top_level(args):
 	options, ckpt_file = load_options_latest_checkpoint(args.save_dir)
 
 	if 'char_cnn' in options:
@@ -49,7 +50,8 @@ def main(args):
 		n_gpus = options['n_gpus']
 
 	# load train_prefixes
-	if args.train_prefix_paths != None:
+	#if args.train_prefix_paths != None:
+	if False:
 		with open(args.train_prefix_paths, "r") as fd:
 			train_prefixes = fd.read().split('\n')
 		train_prefixes = [f for f in train_prefixes if f != ""]
@@ -79,7 +81,7 @@ def main(args):
 		save_options(options, os.path.join(args.save_dir, "options.json"))
 
 
-if __name__ == '__main__':
+def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--save_dir', default=None, help='Location of checkpoint files')
 	#parser.add_argument('--train_prefix_paths', default=None, help='Prefix paths for train files')
@@ -93,5 +95,5 @@ if __name__ == '__main__':
 	if args.save_dir == None:
 		print("ERROR: no save_dir")
 	else:
-		main(args)
+		top_level(args)
 

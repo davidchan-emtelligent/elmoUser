@@ -12,7 +12,10 @@ sys.path.append(current_dir)
 from helper import get_tokens_count, load_options, save_options
 import restarter
 
-def main(args):
+def top_level(args):
+	if not os.path.isdir(args.save_dir):
+		os.system("mkdir %s"%args.save_dir)
+
 	# define the options
 	if args.config_file == None:
 		args.config_file = os.path.join(current_dir, "resources/default_config.json")
@@ -72,7 +75,7 @@ def main(args):
 		save_options(options, os.path.join(args.save_dir, "options.json"))
 
 
-if __name__ == '__main__':
+def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--save_dir', default=None, help='Location of checkpoint files')
 	parser.add_argument('--vocab_file', default=None, help='Vocabulary file')
@@ -85,5 +88,5 @@ if __name__ == '__main__':
 	if args.save_dir == None or args.vocab_file == None or args.train_prefix_paths == None:
 		print("ERROR: no save_dir or vocab_file or train_prefix_paths")
 	else:
-		main(args)
+		top_level(args)
 

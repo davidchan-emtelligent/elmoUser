@@ -11,7 +11,10 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'trainer=elmoUser.trainer:main',
+            'elmo_trainer=elmoUser.trainer:main',
+            'elmo_restarter=elmoUser.restarter:main',
+            'elmo_tester=elmoUser.tester:main',
+            'elmo_model=elmoUser.embedding_model:main',
         ],
     },
     package_data={

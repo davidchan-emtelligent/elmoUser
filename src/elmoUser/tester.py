@@ -4,7 +4,7 @@ import argparse
 from bilm.training import test, load_options_latest_checkpoint, load_vocab
 from bilm.data import LMDataset, BidirectionalLMDataset
 
-def main(args):
+def top_level(args):
     options, ckpt_file = load_options_latest_checkpoint(args.save_dir)
     vocab_file = os.path.join(args.save_dir, 'vocabs.txt')
 
@@ -30,12 +30,12 @@ def main(args):
     test(options, ckpt_file, data, batch_size=args.batch_size)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Compute test perplexity')
     parser.add_argument('--save_dir', help='Location of checkpoint files')
     parser.add_argument('--test_prefix', help='Prefix for test files')
     parser.add_argument('--batch_size', type=int, default=256, help='Batch size')
 
     args = parser.parse_args()
-    main(args)
+    top_level(args)
 

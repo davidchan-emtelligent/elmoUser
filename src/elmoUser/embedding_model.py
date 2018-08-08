@@ -8,7 +8,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
 from helper import load_options, save_options
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--save_dir', help='Location of checkpoint files')
     parser.add_argument('--out_dir', help='Location to keep vocabs, weights and options')
