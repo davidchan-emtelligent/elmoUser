@@ -6,11 +6,11 @@ Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are mod
 
 ### Installation:
 
-virtualenv -p python3 venv3
+	virtualenv -p python3 venv3
 
-source venv3/bin/activate
+	source venv3/bin/activate
 
-pip install -e .
+	pip install -e .
 
 <br>
 
