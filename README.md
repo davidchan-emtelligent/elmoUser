@@ -50,7 +50,7 @@ Auto retrain a sequence of training dirs with span
 	python bin/run_restart.py  \
 	--save_dir checkpoint \
 	--prefixes_dir tests/data/training_dir.paths \
-	--span
+	--span 1:4
 
 <br>
 
