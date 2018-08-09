@@ -9,70 +9,59 @@ Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are mod
 	virtualenv -p python3 venv3
 
 	source venv3/bin/activate
-
+	
+	pip install path\_to\_bilm-tf
+	
 	pip install -e .
-
-<br>
-
-### Test Installation:
-
-	python -m unittest discover tests/
 
 <br>
 
 ### Train:
 	export CUDA_VISIBLE_DEVICES=0,1
 
-	python bin/train_elmo.py \
-	--train_prefix='tests/data/training_filtered/*' \
-	--vocab_file tests/data/vocab_filtered.txt \
+	elmo_trainer \
+	--train_prefix_paths tests/data/train_prefixes.paths \
+	--vocab_file tests/data/vocab_data.txt \
 	--save_dir checkpoint \
-	--config_file bin/resources/small_config.json
+	--config_file src/elmoUser/resources/small_config.json \
+	--n_train_tokens 1280
 
 <br>
 
 ### Test:
 
-	python bin/run_test.py \
-	--test_prefix='tests/data/heldout_filtered/*' \
+	elmo_tester \
+	--test_prefix='tests/data/heldout_data/*' \
 	--save_dir checkpoint
 
 <br>
 
 ### Retrain:
 
-	python bin/restart.py \
-	--train_prefix='tests/data/training_filtered/*' \
+	elmo_restarter \
 	--save_dir checkpoint
-	
-Auto retrain a sequence of training dirs with span
-
-	python bin/run_restart.py  \
-	--save_dir checkpoint \
-	--prefixes_dir tests/data/training_dir.paths \
-	--span 1:4
 
 <br>
 
-### Get weights:
+### Embedding model:
 
-	python bin/dump_weights.py \
+	elmo_model \
 	--save_dir checkpoint \
-	--outfile checkpoint/weights.hdf5
+	--out_dir elmo_embedding_model
 
 <br>
 
-### Get vectors:
+### Embedding vectors:
 Provide a list of tokenized sentences.
 
-	python bin/elmo_embedding.py \
-	--save_dir checkpoint \
-	--input_text tests/data/tokenized_sentences.txt	
+	python src/elmoUser/embedding.py \
+	--model_path elmo_embedding_model \
+	--input_path tests/data/training_data/0_5000.txt	
 	
 Or:
 
 	from bilm import ElmoEmbedding
-	elmo = ElmoEmbedding(save_dir)
+	elmo = ElmoEmbedding(model_path)
 	elmo_context_vecs, context_tokens, context_ids = elmo(tokenized_sentences)
 	
 <br>
@@ -81,17 +70,22 @@ Or:
 
 1 vocab_file: 
 
-	vocabs.txt (will be saved in save_dir and not be changed)
+	vocabs.txt (will be saved in save_dir).
 
-2 train_prefix: 
+2 train_prefix_paths: 
 
-	dir/* (train all files in dir/)
+	txt file to keep all prefixs paths.
 
 3 save_dir:
 
-	checkpoint (save model, vocabs.txt, options.json, weights.hdf5)
-	model is no needed to get embedding vectors.
+	checkpoint (checkpoint, models, vocabs.txt, options.json, weights.hdf5).
+	
+3 model_path:
 
+	emdedding model (vocabs.txt, options.json, weights.hdf5).
+	
+where options\['char_cnn']\["n_characters"] += 1 in embedding_model
+    
 In options.json:
 
 	batch_no = n_epochs*n_batches_per_epoch 
@@ -99,6 +93,8 @@ In options.json:
 	n_batches_per_epoch = n_train_tokens/(batch_size*unroll_steps*n_gpus)
 
 	epoch = batch_no/n_batches_per_epoch
+	
+You can use --n_train_tokens in trainer and restarter to limit the no. of samples when debugging (12800 or 25600).
 
 
 
