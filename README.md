@@ -10,8 +10,12 @@ Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are mod
 
 	source venv3/bin/activate
 	
-	pip install path\_to\_bilm-tf
+Install bilm:
 	
+	pip install path\_to\_bilm-tf
+
+Install elmUser:
+
 	pip install -e .
 
 <br>
@@ -60,7 +64,7 @@ Provide a list of tokenized sentences.
 	
 Or:
 
-	from bilm import ElmoEmbedding
+	from elmoUser.embelling import ElmoEmbedding
 	elmo = ElmoEmbedding(model_path)
 	elmo_context_vecs, context_tokens, context_ids = elmo(tokenized_sentences)
 	
@@ -74,7 +78,7 @@ Or:
 
 2 train_prefix_paths: 
 
-	txt file to keep all prefixs paths.
+	a txt file to keep all prefixs(directories) paths.
 
 3 save_dir:
 
@@ -94,7 +98,7 @@ In options.json:
 
 	epoch = batch_no/n_batches_per_epoch
 	
-You can use --n_train_tokens in trainer and restarter to limit the no. of samples when debugging (12800 or 25600).
+You can use --n_train_tokens in trainer and restarter to limit the batch_no when debugging (12800 or 25600).
 
 
 
