@@ -60,7 +60,11 @@ Provide a list of tokenized sentences.
 
 	python src/elmoUser/embedding.py \
 	--model_path elmo_embedding_model \
-	--input_path tests/data/training_data/0_5000.txt	
+	--input_path tests/data/training_data/0_5000.txt
+	
+	
+	--input_path /shared/dropbox/ctakes_conll/tokenized_text/cr_sentences_10/1000034.txt
+	
 	
 Or:
 
