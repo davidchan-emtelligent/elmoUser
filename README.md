@@ -71,7 +71,7 @@ Or:
 
 	from elmoUser.embelling import ElmoEmbedding
 	elmo = ElmoEmbedding(model_path)
-	elmo_context_vecs, context_tokens, context_ids = elmo(tokenized_sentences)
+	elmo_context_vecs = elmo(tokenized_sentences)
 	
 <br>
 
