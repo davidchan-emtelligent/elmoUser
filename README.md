@@ -91,8 +91,14 @@ Or:
 3 model_path:
 
 	emdedding model (vocabs.txt, options.json, weights.hdf5).
-	
+
 where options\['char_cnn']\["n_characters"] += 1 in embedding_model
+
+4 input_path:
+
+	a text file has tokenized words (separated by ' ') of one sentence on one line.
+	
+<br>
     
 In options.json:
 
