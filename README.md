@@ -73,8 +73,10 @@ Or:
 	elmo = ElmoEmbedding(model_path)
 	elmo_context_vecs = elmo(tokenized_sentences)
 	
-where tokenized_sentences = \[	'Pretrained biLMs compute representations useful for NLP tasks .',
-        			'They give state of the art performance for many tasks .']
+	where tokenized_sentences = [
+		'Pretrained biLMs compute representations useful for NLP tasks .',
+        	'They give state of the art performance for many tasks .'
+		]
 	
 <br>
 
