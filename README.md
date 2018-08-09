@@ -11,7 +11,9 @@ Using embedding from elmo https://github.com/allenai/bilm-tf . All codes are mod
 	source venv3/bin/activate
 	
 Install bilm:
-	
+
+	pip install tensorflow-gpu==1.3 h5py
+	python setup.py install	
 	pip install path\_to\_bilm-tf
 
 Install elmUser:
@@ -63,8 +65,7 @@ Provide a list of tokenized sentences.
 	--input_path tests/data/training_data/0_5000.txt
 	
 	
-	--input_path /shared/dropbox/ctakes_conll/tokenized_text/cr_sentences_10/1000034.txt
-	
+	--input_path /shared/dropbox/ctakes_conll/tokenized_text/cr_sentences_10/1000034.txt	
 	
 Or:
 
